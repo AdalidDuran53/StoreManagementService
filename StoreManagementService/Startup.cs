@@ -26,14 +26,29 @@ namespace StoreManagementService
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            // register swagger generator
+            services.AddSwaggerGen();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            // redirect root to swagger
+            app.Use(async (context, next) => {
+                if (context.Request.Path == "/")
+                {
+                    // permanent redirect to swagger
+                    context.Response.Redirect("/swagger/index.html", permanent: false);
+                    return;
+                }
+                await next();
+            });
+
             if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
+                // for secure implementation, disable swagger in production
+                app.UseSwagger();
+                app.UseSwaggerUI();
             }
 
             app.UseHttpsRedirection();
