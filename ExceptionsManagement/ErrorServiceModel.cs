@@ -56,6 +56,11 @@ namespace ExceptionsManagement
                 code: "OMS-PASSWORD-ERROR",
                 message: "Invalid Password.",
                 details: "Password is not valid."));
+
+            errors.Add("OMS-LOGIN-ERROR", new ErroritemServiceModel(
+                code: "OMS-LOGIN-ERROR",
+                message: "Invalid credentials.",
+                details: "Invalid credentials."));
             #endregion
         }
     }

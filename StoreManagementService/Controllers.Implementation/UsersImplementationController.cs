@@ -1,4 +1,5 @@
-﻿using ExceptionsManagement;
+﻿using DTOs;
+using ExceptionsManagement;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using StoreManagementService.BusinessLogic;
@@ -51,6 +52,35 @@ namespace StoreManagementService.Controllers.Implementation
             }
         }
 
+        [HttpPost]
+        [Route("~/{version::apiVersion}/Users/Login")]
+        public async override Task<IActionResult> Login([FromRoute, RegularExpression("^(?<major>[0-9]+).(?<major>[0-9]+)$"), Required] string version, [Required] string userName, [Required] string password)
+        {
+            // Log the request
+            Dictionary<string, object> request = new Dictionary<string, object> { { "LoginRequest", new object[] { "version: " + version, "userName: " + userName } } };
+            try
+            {
+                // Call the implementation
+                var result = await _userFunctionality.LoginUser(userName, password);
+                // Log the response
+                var sessionLogResponse = await _serviceBaseFunctionality.InitSession(result.UserId);
+                Dictionary<string, object> response = new Dictionary<string, object> { { "LoginResponse", result }, { "SessionLogResponse", sessionLogResponse } };
+                // Log the operation
+                await _serviceBaseFunctionality.LogOperation(request, response);
+                // return the result // OMS-13 update to include session id in the response
+                return Ok(new CustomResponse(statusCode: StatusCodes.Status200OK, message: result.Message, userId: result.UserId, sessionId: sessionLogResponse.SessionId));
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                Dictionary<string, object> response = new Dictionary<string, object> { { "ErrorLoginResponse", ex } };
+                await _serviceBaseFunctionality.LogOperation(request, response);
+                // if the exception is an OperationException, return a bad request with the error details
+                OperationException excep = ((OperationException)ex);
+                return this.BadRequest(new { StatusCode = StatusCodes.Status400BadRequest, code = excep.ErrorCode, message = excep.Message, details = excep.Details });
+            }
+        }
+
         [HttpDelete]
         [Route("~/{version::apiVersion}/Users/DeleteUser")]
         public override Task<IActionResult> DeleteUser([FromRoute, RegularExpression("^(?<major>[0-9]+).(?<major>[0-9]+)$"), Required] string version, [Required] Guid userId, [Required] Guid sessionId)
@@ -58,12 +88,6 @@ namespace StoreManagementService.Controllers.Implementation
             return Task.FromResult<IActionResult>(Ok("AddUser"));
         }
 
-        [HttpPost]
-        [Route("~/{version::apiVersion}/Users/Login")]
-        public override Task<IActionResult> Login([FromRoute, RegularExpression("^(?<major>[0-9]+).(?<major>[0-9]+)$"), Required] string version, [Required] string userName, [Required] string password)
-        {
-            return Task.FromResult<IActionResult>(Ok("AddUser"));
-        }
         [HttpPut]
         [Route("~/{version::apiVersion}/Users/UpdateUser")]
         public override Task<IActionResult> UpdateUser([FromRoute, RegularExpression("^(?<major>[0-9]+).(?<major>[0-9]+)$"), Required] string version, [Required] Guid userId, [Required] Guid sessionId, [Required] string currentPassword, string newPassword = null, string userName = null)
