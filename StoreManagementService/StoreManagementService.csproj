@@ -22,5 +22,10 @@
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="6.3.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\DTOs\DTOs.csproj" />
+    <ProjectReference Include="..\ExceptionsManagement\ExceptionsManagement.csproj" />
+  </ItemGroup>
+
 
 </Project>

@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using ExceptionsManagement;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using StoreManagementService.BusinessLogic;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 
@@ -10,11 +13,42 @@ namespace StoreManagementService.Controllers.Implementation
     [ApiController]
     public class UsersImplementationController : UsersControllerBase
     {
+        private readonly UserFunctionality _userFunctionality;
+        private readonly ServiceBaseFunctionality _serviceBaseFunctionality;
+        private readonly ErrorServiceModel _errorService = new ErrorServiceModel();
+        public UsersImplementationController(UserFunctionality userFunctionality, ServiceBaseFunctionality serviceBaseFunctionality)
+        {
+            _userFunctionality = userFunctionality;
+            _serviceBaseFunctionality = serviceBaseFunctionality;
+            _errorService = new ErrorServiceModel();
+        }
+
         [HttpPost]
         [Route("~/{version::apiVersion}/Users/AddUser")]
-        public override Task<IActionResult> AddUser([FromRoute, RegularExpression("^(?<major>[0-9]+).(?<major>[0-9]+)$"), Required] string version, [Required] string userName, [Required] string password)
+        public override async Task<IActionResult> AddUser([FromRoute, RegularExpression("^(?<major>[0-9]+).(?<major>[0-9]+)$"), Required] string version, [Required] string userName, [Required] string password)
         {
-            return Task.FromResult<IActionResult>(Ok("AddUser"));
+            // Log the request
+            Dictionary<string, object> request = new Dictionary<string, object> { { "CreateNewUserRequest", new object[] { "version: " + version, "userName: " + userName } } };
+            try
+            {
+                // Call the implementation
+                var result = await _userFunctionality.AddUser(userName, password);
+                // Log the response
+                Dictionary<string, object> response = new Dictionary<string, object> { { "CreateNewUserResponse", result } };
+                // Log the operation
+                await _serviceBaseFunctionality.LogOperation(request, response);
+                // return the result
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                Dictionary<string, object> response = new Dictionary<string, object> { { "ErrorCreateNewUserResponse", ex } };
+                await _serviceBaseFunctionality.LogOperation(request, response);
+                // if the exception is an OperationException, return a bad request with the error details
+                OperationException excep = ((OperationException)ex);
+                return this.BadRequest(new { StatusCode = StatusCodes.Status400BadRequest, code = excep.ErrorCode, message = excep.Message, details = excep.Details });
+            }
         }
 
         [HttpDelete]
