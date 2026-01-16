@@ -13,7 +13,8 @@
       "commandName": "IISExpress",
       "launchBrowser": true,
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ConnectionStrings": "Data Source=server;Database=StoreManagement;User ID=user;Password=password;TrustServerCertificate=True;" // replace with actual connection string
       }
     },
     "StoreManagementService": {
