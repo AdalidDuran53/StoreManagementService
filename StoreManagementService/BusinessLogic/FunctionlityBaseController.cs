@@ -165,6 +165,24 @@ namespace StoreManagementService.BusinessLogic
                 throw new OperationException(errorCode: exception.Code, message: exception.Message, details: exception.Details, sessionId: sessionId);
             }
         }
+
+        protected virtual async Task ValidateSession(Guid userId, Guid sessionId)
+        {
+            using (var context = new StoreManagementService.Models.StoreManagementContext())
+            {
+                // find the user by user name
+                var user = await context.Users
+                .FirstOrDefaultAsync(u => u.UserId == userId && u.IsDeleted == false);
+                // load the session logs for the user
+                var SessionLogs = user != null ? await context.SessionLogs.Where(s => s.UserId == userId && s.EndSession == null).ToListAsync() : new List<Models.SessionLog>();
+                // if the user is not found, the session id does not match or the current password does not match, throw an error
+                if (user == null || !SessionLogs.Any(s => s.SessionId == sessionId))
+                {
+                    var exception = this._errorService.GetError("OMS-SESSION-ERROR");
+                    throw new OperationException(errorCode: exception.Code, message: exception.Message, details: exception.Details, new Guid());
+                }
+            }
+        }
         #endregion
     }
 }
