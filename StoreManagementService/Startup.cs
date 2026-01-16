@@ -1,15 +1,18 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using ExceptionsManagement;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using StoreManagementService.BusinessLogic;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace StoreManagementService
 {
@@ -28,6 +31,18 @@ namespace StoreManagementService
             services.AddControllers();
             // register swagger generator
             services.AddSwaggerGen();
+
+            // Configure API versioning
+            services.AddApiVersioning(options =>
+            {
+                options.ApiVersionReader = new MediaTypeApiVersionReader();
+                options.AssumeDefaultVersionWhenUnspecified = true;
+                options.ApiVersionSelector = new CurrentImplementationApiVersionSelector(options);
+            });
+
+            services.AddScoped<ServiceBaseFunctionality>();
+            services.AddScoped<UserFunctionality>();
+            services.AddScoped<ErrorServiceModel>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -56,6 +71,9 @@ namespace StoreManagementService
             app.UseRouting();
 
             app.UseAuthorization();
+
+            // Enable API versioning
+            app.UseApiVersioning();
 
             app.UseEndpoints(endpoints =>
             {

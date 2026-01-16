@@ -1,3 +1,5 @@
 <Solution>
+  <Project Path="DTOs/DTOs.csproj" Id="9370bdbb-8a36-4217-99a3-cbaa71a85133" />
+  <Project Path="ExceptionsManagement/ExceptionsManagement.csproj" Id="5086b6c4-dc6d-457b-9a71-5ffa2f440046" />
   <Project Path="StoreManagementService/StoreManagementService.csproj" />
 </Solution>
