@@ -1,5 +1,6 @@
 ﻿using DTOs;
 using ExceptionsManagement;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -38,6 +39,44 @@ namespace StoreManagementService.BusinessLogic
                 // return the result
                 var result = Ok(new { success = true, message = "Data saved successfully." });
                 return result;
+            }
+            catch (Exception ex)
+            {
+                // if the exception is an OperationException, rethrow it
+                if (ex is OperationException)
+                    throw ex;
+                // otherwise, throw a general error
+                var exception = this._errorService.GetError("OMS-GENERAL-ERROR");
+                throw new OperationException(errorCode: exception.Code, message: exception.Message, details: exception.Details, new Guid());
+            }
+        }
+
+        public async Task<CustomResponse> LoginUser(string userName, string password)
+        {
+            try
+            {
+                // hash the password
+                var pass = HashPassword(password);
+                // build the user object
+                User DataUser = new User(userId: Guid.NewGuid(), userName: userName, password: pass.Hash, salst: pass.Salt);
+                // validate the user object
+                this.ValidateModel(DataUser);
+                // check the user credentials
+                using (var context = new StoreManagementService.Models.StoreManagementContext())
+                {
+                    // find the user by user name
+                    var user = await context.Users
+                    .FirstOrDefaultAsync(u => u.UserName == DataUser.UserName && u.IsDeleted == false);
+                    // if the user is not found or the password does not match, throw an error
+                    if (user == null || !this.VerifyPassword(password, user.PasswordHash, user.PasswordSalst))
+                    {
+                        var exception = this._errorService.GetError("OMS-LOGIN-ERROR");
+                        throw new OperationException(errorCode: exception.Code, message: exception.Message, details: exception.Details, new Guid());
+                    }
+
+                    // return the result
+                    return new CustomResponse(statusCode: StatusCodes.Status200OK, message: "Login successfully.", userId: user.UserId);
+                }
             }
             catch (Exception ex)
             {
