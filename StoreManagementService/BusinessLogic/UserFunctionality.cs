@@ -88,5 +88,34 @@ namespace StoreManagementService.BusinessLogic
                 throw new OperationException(errorCode: exception.Code, message: exception.Message, details: exception.Details, new Guid());
             }
         }
+
+        public async Task<CustomResponse> DeleteUser(Guid userId, Guid sessionId)
+        {
+            try
+            {
+                await this.ValidateSession(userId, sessionId);
+                using (var context = new StoreManagementService.Models.StoreManagementContext())
+                {
+                    // find the user by user name
+                    var user = await context.Users
+                    .FirstOrDefaultAsync(u => u.UserId == userId && u.IsDeleted == false);
+                    // mark the user as deleted
+                    user.IsDeleted = true;
+                    context.Users.Update(user);
+                    await context.SaveChangesAsync();
+                    // return the result
+                    return new CustomResponse(statusCode: StatusCodes.Status200OK, message: "Deleted user successfully.", userId: user.UserId, sessionId: sessionId);
+                }
+            }
+            catch (Exception ex)
+            {
+                // if the exception is an OperationException, rethrow it
+                if (ex is OperationException)
+                    throw ex;
+                // otherwise, throw a general error
+                var exception = this._errorService.GetError("OMS-GENERAL-ERROR");
+                throw new OperationException(errorCode: exception.Code, message: exception.Message, details: exception.Details, sessionId: sessionId);
+            }
+        }
     }
 }
