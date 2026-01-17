@@ -13,40 +13,34 @@ using System.Threading.Tasks;
 
 namespace StoreManagementService.BusinessLogic
 {
-    public class ItemClientFunctionality : FunctionalityBaseController
+    public class ItemStoreFunctionality : FunctionalityBaseController
     {
-        public async Task<ActionResult> addItem(Guid clientId, Guid sessionId, Guid itemID, int itemAmount, DateTime operationDate)
+        public async Task<ActionResult> addItem(Guid clientId, Guid sessionId, Guid itemID, Guid storeId, DateTime operationDate)
         {
             try
             {
                 await this.ValidateSession(clientId, sessionId);
 
                 // build the item object
-                ItemsClientsRelationship newItem = new ItemsClientsRelationship(id: Guid.NewGuid(), clientId: clientId, itemId: itemID, itemAmount: itemAmount, operationDate: operationDate);
+                ItemsStoresRelationship newItem = new ItemsStoresRelationship(id: Guid.NewGuid(), itemId: itemID, storeId: storeId, operationDate: operationDate);
                 // validate the item object
                 this.ValidateModel(newItem);
                 // save the item object
                 using (var context = new StoreManagementService.Models.StoreManagementContext())
                 {
 
-                    // check if the item stock is sufficient
-                    var itemStock = await context.Items.FirstOrDefaultAsync(s => s.ItemId.Equals(newItem.ItemId));
+                    // check if the item is no deleted
+                    var itemStock = await context.Items.FirstOrDefaultAsync(s => s.ItemId.Equals(newItem.ItemId) && s.IsDeleted == false);
                     if (itemStock == null)
                     {
-                        // if is no sufficient, throw an exception
+                        // if not, throw an exception
                         var exception = this._errorService.GetError("OMS-ITEM-NOTFOUND-ERROR");
-                        throw new OperationException(errorCode: exception.Code, message: exception.Message, details: exception.Details, new Guid());
-                    }
-                    if (itemStock.ItemStock < newItem.ItemAmount)
-                    {
-                        // if is no sufficient, throw an exception
-                        var exception = this._errorService.GetError("OMS-ITEMAMOUNT-ERROR");
                         throw new OperationException(errorCode: exception.Code, message: exception.Message, details: exception.Details, new Guid());
                     }
 
                     // map the item object to the entity model
-                    var item = Mapster.TypeAdapter.Adapt<Models.ItemsClientsRelationship>(newItem);
-                    context.ItemsClientsRelationships.Add(item);
+                    var item = Mapster.TypeAdapter.Adapt<Models.ItemsStoresRelationship>(newItem);
+                    context.ItemsStoresRelationships.Add(item);
                     await context.SaveChangesAsync();
                 }
                 // return the result
@@ -73,12 +67,12 @@ namespace StoreManagementService.BusinessLogic
                 using (var context = new StoreManagementService.Models.StoreManagementContext())
                 {
                     // init the list of item
-                    List<Models.ItemsClientsRelationship> existingItems = new List<Models.ItemsClientsRelationship>();
+                    List<Models.ItemsStoresRelationship> existingItems = new List<Models.ItemsStoresRelationship>();
                     // if itemId has value
                     if (itemId.HasValue)
                     {
                         // check if the item exists
-                        var item = await context.ItemsClientsRelationships.FirstOrDefaultAsync(t => t.ItemId == itemId && t.IsDeleted == false && t.WasSold == false);
+                        var item = await context.ItemsStoresRelationships.FirstOrDefaultAsync(t => t.ItemId == itemId && !t.IsDeleted.GetValueOrDefault());
                         // if not, throw an exception
                         if (item == null)
                         {
@@ -91,10 +85,10 @@ namespace StoreManagementService.BusinessLogic
                     else
                     {
                         // get all items
-                        existingItems = await context.ItemsClientsRelationships.Where(t => t.IsDeleted == false && t.WasSold == false).ToListAsync();
+                        existingItems = await context.ItemsStoresRelationships.ToListAsync();
                     }
 
-                    var itemsResult = existingItems.Adapt<List<ItemsClientsRelationship>>();
+                    var itemsResult = existingItems.Adapt<List<ItemsStoresRelationship>>();
                     // return the result
                     return new CustomResponse(statusCode: StatusCodes.Status200OK, message: "Get data successfully.", clientId: clientId, sessionId: sessionId, data: itemsResult);
                 }
@@ -111,63 +105,6 @@ namespace StoreManagementService.BusinessLogic
             }
         }
 
-        public async Task<CustomResponse> SellItems(Guid clientId, Guid sessionId)
-        {
-            try
-            {
-                // validate the session
-                await this.ValidateSession(clientId, sessionId);
-                using (var context = new StoreManagementService.Models.StoreManagementContext())
-                {// init the list of item
-                    List<Models.ItemsClientsRelationship> existingItems = new List<Models.ItemsClientsRelationship>();
-                    // check if the item exists
-                    var items = await context.ItemsClientsRelationships.Where(t => t.ClientId == clientId && t.IsDeleted == false && t.WasSold == false).ToListAsync();
-                    var itemsIds = items.Select(i => i.ItemId).ToList();
-                    var itemsStock = await context.Items.Where(i => itemsIds.Contains(i.ItemId)).ToListAsync();
-                    // if not, throw an exception
-                    if (items == null || items.Count == 0)
-                    {
-                        var exception = this._errorService.GetError("OMS-ITEM-NOTFOUND-ERROR");
-                        throw new OperationException(errorCode: exception.Code, message: exception.Message, details: exception.Details, new Guid());
-                    }
-
-                    foreach (var item in items)
-                    {
-                        // check if the stock is sufficient
-                        var itemStock = itemsStock.FirstOrDefault(i => i.ItemId == item.ItemId);
-                        if (itemStock.ItemStock >= item.ItemAmount && itemStock.IsDeleted == false)
-                        {
-                            // mark the item as sold
-                            item.WasSold = true;
-                            context.ItemsClientsRelationships.Update(item);
-                            // decrease the stock
-                            itemStock.ItemStock -= item.ItemAmount;
-                            context.Items.Update(itemStock);
-                        } // check if the item was deleted
-                        else if(itemStock.IsDeleted == true)
-                        {
-                            item.IsDeleted = true;
-                            context.ItemsClientsRelationships.Update(item);
-                        }
-                    }
-                    await context.SaveChangesAsync();
-                    // return the result
-                    return new CustomResponse(statusCode: StatusCodes.Status200OK, message: "Updated item successfully.", clientId: clientId, sessionId: sessionId);
-
-
-                }
-            }
-            catch (Exception ex)
-            {
-                // if the exception is an OperationException, rethrow it
-                if (ex is OperationException)
-                    throw ex;
-                // otherwise, throw a general error
-                var exception = this._errorService.GetError("OMS-GENERAL-ERROR");
-                throw new OperationException(errorCode: exception.Code, message: exception.Message, details: exception.Details, sessionId: sessionId);
-            }
-        }
-
         public async Task<CustomResponse> DeleteItem(Guid clientId, Guid sessionId, Guid itemId)
         {
             try
@@ -176,8 +113,8 @@ namespace StoreManagementService.BusinessLogic
                 using (var context = new StoreManagementService.Models.StoreManagementContext())
                 {
                     // find the Item by StoreId
-                    var item = await context.ItemsClientsRelationships
-                    .FirstOrDefaultAsync(u => u.ItemId == itemId && u.IsDeleted == false && u.WasSold == false);
+                    var item = await context.ItemsStoresRelationships
+                    .FirstOrDefaultAsync(u => u.ItemId == itemId && u.IsDeleted == false);
                     if (item == null)
                     {
                         var exception = this._errorService.GetError("OMS-ITEM-NOTFOUND-ERROR");
@@ -186,7 +123,7 @@ namespace StoreManagementService.BusinessLogic
 
                     // mark the Item as deleted
                     item.IsDeleted = true;
-                    context.ItemsClientsRelationships.Update(item);
+                    context.ItemsStoresRelationships.Update(item);
                     await context.SaveChangesAsync();
                     // return the result
                     return new CustomResponse(statusCode: StatusCodes.Status200OK, message: "Deleted item successfully.", clientId: clientId, sessionId: sessionId);
