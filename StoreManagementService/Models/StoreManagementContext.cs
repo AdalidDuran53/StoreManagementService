@@ -42,10 +42,10 @@ namespace StoreManagementService.Models
 
             modelBuilder.Entity<Client>(entity =>
             {
-                entity.HasIndex(e => e.ClientName, "UQ__Clients__65800DA05A5AB222")
+                entity.HasIndex(e => e.ClientName, "UQ__Clients__65800DA093A6C6EB")
                     .IsUnique();
 
-                entity.HasIndex(e => e.UserName, "UQ__Clients__C9F28456DDDA6553")
+                entity.HasIndex(e => e.UserName, "UQ__Clients__C9F28456F272949F")
                     .IsUnique();
 
                 entity.Property(e => e.ClientId)
@@ -106,9 +106,15 @@ namespace StoreManagementService.Models
 
                 entity.Property(e => e.ClientId).HasColumnName("ClientID");
 
+                entity.Property(e => e.IsDeleted)
+                    .HasColumnName("isDeleted")
+                    .HasDefaultValueSql("((0))");
+
                 entity.Property(e => e.ItemId).HasColumnName("ItemID");
 
                 entity.Property(e => e.OperationDate).HasColumnType("datetime");
+
+                entity.Property(e => e.WasSold).HasDefaultValueSql("((0))");
 
                 entity.HasOne(d => d.Client)
                     .WithMany(p => p.ItemsClientsRelationships)
@@ -149,7 +155,7 @@ namespace StoreManagementService.Models
             modelBuilder.Entity<OperationLog>(entity =>
             {
                 entity.HasKey(e => e.OperationId)
-                    .HasName("PK__Operatio__A4F5FC64DA79D0A9");
+                    .HasName("PK__Operatio__A4F5FC64EA96C1C1");
 
                 entity.ToTable("OperationLog");
 
@@ -162,13 +168,13 @@ namespace StoreManagementService.Models
                 entity.HasOne(d => d.Session)
                     .WithMany(p => p.OperationLogs)
                     .HasForeignKey(d => d.SessionId)
-                    .HasConstraintName("FK__Operation__Respo__398D8EEE");
+                    .HasConstraintName("FK__Operation__Respo__3B75D760");
             });
 
             modelBuilder.Entity<SessionLog>(entity =>
             {
                 entity.HasKey(e => e.SessionId)
-                    .HasName("PK__SessionL__C9F492701D57D51A");
+                    .HasName("PK__SessionL__C9F49270725DEADA");
 
                 entity.ToTable("SessionLog");
 
@@ -185,7 +191,7 @@ namespace StoreManagementService.Models
                 entity.HasOne(d => d.Client)
                     .WithMany(p => p.SessionLogs)
                     .HasForeignKey(d => d.ClientId)
-                    .HasConstraintName("FK__SessionLo__EndSe__36B12243");
+                    .HasConstraintName("FK__SessionLo__EndSe__38996AB5");
             });
 
             modelBuilder.Entity<Store>(entity =>

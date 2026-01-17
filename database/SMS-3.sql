@@ -49,15 +49,16 @@ CREATE TABLE StoreManagement.dbo.ItemsStoresRelationship (
 );
 
 CREATE TABLE StoreManagement.dbo.ItemsClientsRelationship (
-
 	ID UNIQUEIDENTIFIER PRIMARY KEY, -- must be UNIQUEIDENTIFIER
 	ClientID UNIQUEIDENTIFIER,
 	ItemID UNIQUEIDENTIFIER,
+	ItemAmont INT NOT NULL,
     FOREIGN KEY (ClientID) REFERENCES Clients(ClientID),
     FOREIGN KEY (ItemID) REFERENCES Items(ItemID),
     OperationDate DATETIME NOT NULL,
+    isDeleted BIT DEFAULT 0, -- isDeleted, DEFAULT 0 => isDeleted = false
+    WasSold BIT DEFAULT 0 -- isDeleted, DEFAULT 0 => isDeleted = false);
 );
-
 
 --****************************** CONTROL TABLES ******************************
 CREATE TABLE StoreManagement.dbo.SessionLog (
