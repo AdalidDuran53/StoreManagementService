@@ -84,6 +84,24 @@ namespace ExceptionsManagement
                 message: "unexpected error.",
                 details: "An unexpected error has occurred in the service. Please try again later or contact the administrator if the problem persists."));
             #endregion
+
+            #region Store
+            errors.Add("OMS-STOREBRANCH-ERROR" 
+                , new ErroritemServiceModel(
+                code: "OMS-STOREBRANCH-ERROR",
+                message: "Invalid Store branch.",
+                details: "Store branch is not valid."));
+
+            errors.Add("OMS-STOREADDRESS-ERROR", new ErroritemServiceModel(
+                code: "OMS-STOREADDRESS-ERROR",
+                message: "Invalid Store address.",
+                details: "Store address is not valid."));
+
+            errors.Add("OMS-STORE-NOTFOUND-ERROR", new ErroritemServiceModel(
+                code: "OMS-STORE-NOTFOUND-ERROR",
+                message: "Invalid Store.",
+                details: "Store is not valid."));
+            #endregion
         }
     }
 }

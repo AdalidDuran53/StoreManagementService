@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace StoreManagementService.BusinessLogic
 {
-    public class UserFunctionality : FunctionalityBaseController
+    public class ClientFunctionality : FunctionalityBaseController
     {
         public async Task<ActionResult> AddClient(string userName, string clientName, string clientLastName, string clientAddress, string password)
         {

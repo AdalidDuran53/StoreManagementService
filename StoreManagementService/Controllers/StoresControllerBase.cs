@@ -12,36 +12,35 @@ namespace StoreManagementService.Controllers
     [ApiController]
     [ApiVersion("0.1")]
     [Route("[controller]")]
-    public abstract class ClientsControllerBase : ControllerBase
+    public abstract class StoresControllerBase : ControllerBase
     {
         [HttpPost]
-        [Route("~/{version}/Clients/")]
+        [Route("~/{version}/Stores/")]
         [SwaggerOperation(OperationId = "CreateUser")]
         [SwaggerResponse(statusCode: 200, type: typeof(ActionResult), description: "Ok")]
         [SwaggerResponse(statusCode: 400, type: typeof(ActionResult), description: "Bab Request")]
         [SwaggerResponse(statusCode: 401, type: typeof(ActionResult), description: "Unauthorized")]
-        public abstract Task<IActionResult> AddClient([FromRoute][Required][RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$")] string version, [Required] string userName, [Required] string password, [Required] string clientName, [Required] string clientLastName, [Required] string clientAddress);
+        public abstract Task<IActionResult> AddStore([FromRoute][Required][RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$")] string version, [Required] Guid clientId, [Required] Guid sessionId, [Required] string storeBranch, [Required] string storeAddress);
 
         [HttpPost]
-        [Route("~/{version}/Clients/")]
+        [Route("~/{version}/Stores/")]
         [SwaggerResponse(statusCode: 200, type: typeof(ActionResult), description: "Ok")]
         [SwaggerResponse(statusCode: 400, type: typeof(ActionResult), description: "Bab Request")]
         [SwaggerResponse(statusCode: 401, type: typeof(ActionResult), description: "Unauthorized")]
-        public abstract Task<IActionResult> Login([FromRoute][Required][RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$")] string version, [Required] string userName, [Required] string password);
+        public abstract Task<IActionResult> GetStore([FromRoute][Required][RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$")] string version, [Required] Guid clientId, [Required] Guid sessionId, Guid? storeId = null);
 
         [HttpPut]
-        [Route("~/{version}/Clients/")]
+        [Route("~/{version}/Stores/")]
         [SwaggerResponse(statusCode: 200, type: typeof(ActionResult), description: "Ok")]
         [SwaggerResponse(statusCode: 400, type: typeof(ActionResult), description: "Bab Request")]
         [SwaggerResponse(statusCode: 401, type: typeof(ActionResult), description: "Unauthorized")]
-        public abstract Task<IActionResult> UpdateClient([FromRoute][Required][RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$")] string version, [Required] Guid clientId, [Required] Guid sessionId, [Required] string currentPassword, string newPassword = null, string userName = null, string newClientName = null, string newClientLastName = null, string newClientAddress = null);
+        public abstract Task<IActionResult> UpdateStore([FromRoute][Required][RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$")] string version, [Required] Guid clientId, [Required] Guid sessionId, [Required] Guid storeId, string newStoreBranch = null,  string newStoreAddress = null);
 
         [HttpDelete]
-        [Route("~/{version}/Clients/")]
+        [Route("~/{version}/Stores/")]
         [SwaggerResponse(statusCode: 200, type: typeof(ActionResult), description: "Ok")]
         [SwaggerResponse(statusCode: 400, type: typeof(ActionResult), description: "Bab Request")]
         [SwaggerResponse(statusCode: 401, type: typeof(ActionResult), description: "Unauthorized")]
-        public abstract Task<IActionResult> DeleteClient([FromRoute][Required][RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$")] string version, [Required] Guid clientId, [Required] Guid sessionId);
-
+        public abstract Task<IActionResult> DeleteStore([FromRoute][Required][RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$")] string version, [Required] Guid clientId, [Required] Guid sessionId, Guid storeId);
     }
 }
