@@ -119,6 +119,13 @@ namespace ExceptionsManagement
                 message: "Invalid Item.",
                 details: "Item is not valid."));
             #endregion
+
+            #region ItemClient
+            errors.Add("OMS-ITEMAMOUNT-ERROR", new ErroritemServiceModel(
+                code: "OMS-ITEMAMOUNT-ERROR",
+                message: "Invalid amount.",
+                details: "amount is not valid."));
+            #endregion
         }
     }
 }
