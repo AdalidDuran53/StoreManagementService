@@ -70,7 +70,7 @@ namespace StoreManagementService.BusinessLogic
             try
             {
                 // set custom session log object
-                SessionLog sessionLog = new SessionLog(userId: userId, sessionId: Guid.NewGuid(), initSession: DateTime.Now);
+                SessionLog sessionLog = new SessionLog(clientId: userId, sessionId: Guid.NewGuid(), initSession: DateTime.Now);
 
                 // save the operation log object
                 using (var context = new StoreManagementService.Models.StoreManagementContext())
@@ -80,7 +80,7 @@ namespace StoreManagementService.BusinessLogic
                     var session = Mapster.TypeAdapter.Adapt<Models.SessionLog>(sessionLog);
                     context.SessionLogs.Add(session);
                     await context.SaveChangesAsync();
-                    return new CustomResponse(statusCode: StatusCodes.Status200OK, message: "Session initialized successfully.", userId: userId, sessionId: sessionLog.SessionId, data: data.Result.Data);
+                    return new CustomResponse(statusCode: StatusCodes.Status200OK, message: "Session initialized successfully.", clientId: userId, sessionId: sessionLog.SessionId, data: data.Result.Data);
                 }
             }
             catch (Exception ex)
@@ -103,7 +103,7 @@ namespace StoreManagementService.BusinessLogic
                     // init data list
                     List<object> data = new List<object>();
                     // check for existing sessions for the user and close them
-                    var existingSession = await context.SessionLogs.Where(s => s.UserId == userId && s.EndSession == null).ToListAsync();
+                    var existingSession = await context.SessionLogs.Where(s => s.ClientId == userId && s.EndSession == null).ToListAsync();
                     // close existing sessions
                     foreach (var sessionitem in existingSession)
                     {
@@ -112,7 +112,7 @@ namespace StoreManagementService.BusinessLogic
                         // add the result to the data list
                         data.Add(result.Result);
                     }
-                    return new CustomResponse(statusCode: StatusCodes.Status200OK, message: "Session closed successfully.", userId: userId, sessionId: sessionId, data: data);
+                    return new CustomResponse(statusCode: StatusCodes.Status200OK, message: "Session closed successfully.", clientId: userId, sessionId: sessionId, data: data);
                 }
             }
             catch (Exception ex)
@@ -147,7 +147,7 @@ namespace StoreManagementService.BusinessLogic
                     Dictionary<string, object> data = new Dictionary<string, object>
                     {
                         { "message", "Session closed successfully." },
-                        { "UserId", sessionLog.UserId.GetValueOrDefault() },
+                        { "ClientId", sessionLog.ClientId.GetValueOrDefault() },
                         { "SessionId", sessionLog.SessionId },
                         { "InitSession", sessionLog.InitSession },
                         { "EndSession", sessionLog.EndSession }
@@ -166,15 +166,15 @@ namespace StoreManagementService.BusinessLogic
             }
         }
 
-        protected virtual async Task ValidateSession(Guid userId, Guid sessionId)
+        protected virtual async Task ValidateSession(Guid ClientId, Guid sessionId)
         {
             using (var context = new StoreManagementService.Models.StoreManagementContext())
             {
                 // find the user by user name
-                var user = await context.Users
-                .FirstOrDefaultAsync(u => u.UserId == userId && u.IsDeleted == false);
+                var user = await context.Clients
+                .FirstOrDefaultAsync(u => u.ClientId == ClientId && u.IsDeleted == false);
                 // load the session logs for the user
-                var SessionLogs = user != null ? await context.SessionLogs.Where(s => s.UserId == userId && s.EndSession == null).ToListAsync() : new List<Models.SessionLog>();
+                var SessionLogs = user != null ? await context.SessionLogs.Where(s => s.ClientId == ClientId && s.EndSession == null).ToListAsync() : new List<Models.SessionLog>();
                 // if the user is not found, the session id does not match or the current password does not match, throw an error
                 if (user == null || !SessionLogs.Any(s => s.SessionId == sessionId))
                 {
