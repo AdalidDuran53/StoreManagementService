@@ -12,7 +12,7 @@ CREATE TABLE StoreManagement.dbo.Clients (
     ClientID UNIQUEIDENTIFIER PRIMARY KEY, -- UserID, must be UNIQUEIDENTIFIER
     UserName NVARCHAR(50) UNIQUE,         -- User name, must be UNIQUE
     ClientName NVARCHAR(50) UNIQUE,         -- User name, must be UNIQUE
-	ClientLastName NVARCHAR(100)  NOT NULL,		-- required
+	ClientLastName NVARCHAR(100) NOT NULL,		-- required
     ClientAddress NVARCHAR(MAX) NOT NULL,		-- required
     PasswordHash NVARCHAR(MAX) NOT NULL,          -- PasswordHash, required
     PasswordSalst NVARCHAR(MAX) NOT NULL,          -- PasswordHash, required
@@ -46,13 +46,14 @@ CREATE TABLE StoreManagement.dbo.ItemsStoresRelationship (
     FOREIGN KEY (ItemID) REFERENCES Items(ItemID),
     FOREIGN KEY (StoreID) REFERENCES Stores(StoreID),
     OperationDate DATETIME NOT NULL,
+    isDeleted BIT DEFAULT 0, -- isDeleted, DEFAULT 0 => isDeleted = false
 );
 
 CREATE TABLE StoreManagement.dbo.ItemsClientsRelationship (
 	ID UNIQUEIDENTIFIER PRIMARY KEY, -- must be UNIQUEIDENTIFIER
 	ClientID UNIQUEIDENTIFIER,
 	ItemID UNIQUEIDENTIFIER,
-	ItemAmont INT NOT NULL,
+	ItemAmount INT NOT NULL,
     FOREIGN KEY (ClientID) REFERENCES Clients(ClientID),
     FOREIGN KEY (ItemID) REFERENCES Items(ItemID),
     OperationDate DATETIME NOT NULL,

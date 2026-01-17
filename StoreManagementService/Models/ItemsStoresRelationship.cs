@@ -11,6 +11,7 @@ namespace StoreManagementService.Models
         public Guid? ItemId { get; set; }
         public Guid? StoreId { get; set; }
         public DateTime OperationDate { get; set; }
+        public bool? IsDeleted { get; set; }
 
         public virtual Item Item { get; set; }
         public virtual Store Store { get; set; }
