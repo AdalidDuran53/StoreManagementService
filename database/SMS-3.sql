@@ -30,10 +30,11 @@ CREATE TABLE StoreManagement.dbo.Stores (
 
 CREATE TABLE StoreManagement.dbo.Items (
     ItemID UNIQUEIDENTIFIER PRIMARY KEY, -- ItemID, must be UNIQUEIDENTIFIER
+    ItemCode NVARCHAR(50)  NOT NULL,			-- required
     ItemDescription NVARCHAR(50)  NOT NULL,			-- required
 	ItemPrice DECIMAL(10, 2) NOT NULL,		-- required
 	ItemImg IMAGE  NOT NULL,		-- required
-	ItemStock INT,
+	ItemStock INT NOT NULL,
     isDeleted BIT DEFAULT 0 -- isDeleted, DEFAULT 0 => isDeleted = false
 );
 

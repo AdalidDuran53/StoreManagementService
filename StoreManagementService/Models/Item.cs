@@ -14,10 +14,11 @@ namespace StoreManagementService.Models
         }
 
         public Guid ItemId { get; set; }
+        public string ItemCode { get; set; }
         public string ItemDescription { get; set; }
         public decimal ItemPrice { get; set; }
         public byte[] ItemImg { get; set; }
-        public int? ItemStock { get; set; }
+        public int ItemStock { get; set; }
         public bool? IsDeleted { get; set; }
 
         public virtual ICollection<ItemsClientsRelationship> ItemsClientsRelationships { get; set; }

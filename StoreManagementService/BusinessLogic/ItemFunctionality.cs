@@ -6,28 +6,41 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace StoreManagementService.BusinessLogic
 {
-    public class StoreFunctionality : FunctionalityBaseController
+    public class ItemFunctionality : FunctionalityBaseController
     {
-        public async Task<ActionResult> addStore(Guid clientId, Guid sessionId, string storeBranch, string storeAddress)
+        public async Task<ActionResult> addItem(Guid clientId, Guid sessionId, string itemCode, string itemDescription, decimal itemPrice, IFormFile itemImg, int itemStock)
         {
             try
             {
                 await this.ValidateSession(clientId, sessionId);
-                // build the store object
-                Store newStore = new Store(storeId: Guid.NewGuid(), storeBranch: storeBranch, storeAddress: storeAddress);
-                // validate the store object
-                this.ValidateModel(newStore);
-                // save the store object
+
+                // Convert IFormFile to byte[]
+                byte[] itemImgBytes = null;
+                if (itemImg != null && itemImg.Length > 0)
+                {
+                    using (var ms = new System.IO.MemoryStream())
+                    {
+                        await itemImg.CopyToAsync(ms);
+                        itemImgBytes = ms.ToArray();
+                    }
+                }
+
+                // build the item object
+                Item newItem = new Item(itemId: Guid.NewGuid(), itemCode: itemCode, itemDescription: itemDescription, itemPrice: itemPrice, itemImg: itemImgBytes, itemStock: itemStock);
+                // validate the item object
+                this.ValidateModel(newItem);
+                // save the item object
                 using (var context = new StoreManagementService.Models.StoreManagementContext())
                 {
-                    // map the store object to the entity model
-                    var store = Mapster.TypeAdapter.Adapt<Models.Store>(newStore);
-                    context.Stores.Add(store);
+                    // map the item object to the entity model
+                    var item = Mapster.TypeAdapter.Adapt<Models.Item>(newItem);
+                    context.Items.Add(item);
                     await context.SaveChangesAsync();
                 }
                 // return the result
@@ -45,7 +58,7 @@ namespace StoreManagementService.BusinessLogic
             }
         }
 
-        public async Task<CustomResponse> GetStore(Guid clientId, Guid sessionId, Guid? storeId)
+        public async Task<CustomResponse> GetItem(Guid clientId, Guid sessionId, Guid? itemId)
         {
             try
             {
@@ -53,31 +66,31 @@ namespace StoreManagementService.BusinessLogic
                 await this.ValidateSession(clientId, sessionId);
                 using (var context = new StoreManagementService.Models.StoreManagementContext())
                 {
-                    // init the list of stores
-                    List<Models.Store> existingStores = new List<Models.Store>();
-                    // if storeId has value
-                    if (storeId.HasValue)
+                    // init the list of item
+                    List<Models.Item> existingItems = new List<Models.Item>();
+                    // if itemId has value
+                    if (itemId.HasValue)
                     {
-                        // check if the store exists
-                        var store = await context.Stores.FirstOrDefaultAsync(t => t.StoreId == storeId && t.IsDeleted == false);
+                        // check if the item exists
+                        var item = await context.Items.FirstOrDefaultAsync(t => t.ItemId == itemId && t.IsDeleted == false);
                         // if not, throw an exception
-                        if (store == null)
+                        if (item == null)
                         {
-                            var exception = this._errorService.GetError("OMS-STORE-NOTFOUND-ERROR");
+                            var exception = this._errorService.GetError("OMS-ITEM-NOTFOUND-ERROR");
                             throw new OperationException(errorCode: exception.Code, message: exception.Message, details: exception.Details, new Guid());
                         }
                         else
-                            existingStores.Add(store);
+                            existingItems.Add(item);
                     }
                     else
                     {
-                        // get all stores
-                        existingStores = await context.Stores.Where(t => t.IsDeleted == false).ToListAsync();
+                        // get all items
+                        existingItems = await context.Items.Where(t => t.IsDeleted == false).ToListAsync();
                     }
 
-                    var storesResult = existingStores.Adapt<List<Store>>();
+                    var itemsResult = existingItems.Adapt<List<Item>>();
                     // return the result
-                    return new CustomResponse(statusCode: StatusCodes.Status200OK, message: "Get data successfully.", clientId: clientId, sessionId: sessionId, data: storesResult);
+                    return new CustomResponse(statusCode: StatusCodes.Status200OK, message: "Get data successfully.", clientId: clientId, sessionId: sessionId, data: itemsResult);
                 }
 
             }
@@ -92,7 +105,7 @@ namespace StoreManagementService.BusinessLogic
             }
         }
 
-        public async Task<CustomResponse> UpdateStore(Guid clientId, Guid sessionId, Guid storeId, string newStoreBranch, string newStoreAddress)
+        public async Task<CustomResponse> UpdateItem(Guid clientId, Guid sessionId, Guid itemId, string itemCode, string itemDescription, decimal? itemPrice, IFormFile? itemImg, int? itemStock)
         {
             try
             {
@@ -100,25 +113,35 @@ namespace StoreManagementService.BusinessLogic
                 await this.ValidateSession(clientId, sessionId);
                 using (var context = new StoreManagementService.Models.StoreManagementContext())
                 {
-                    // find the Store by StoreId
-                    var store = await context.Stores
-                    .FirstOrDefaultAsync(u => u.StoreId == storeId && u.IsDeleted == false);
+                    // find the item by StoreId
+                    var item = await context.Items
+                    .FirstOrDefaultAsync(u => u.ItemId == itemId && u.IsDeleted == false);
 
-                    // if new Store Branch is provided, hash it and update the Branch
-                    if (!String.IsNullOrEmpty(newStoreBranch))
-                        store.StoreBranch = newStoreBranch;
-                    // if new Store Address is provided, update the Address
-                    if (!String.IsNullOrEmpty(newStoreAddress))
-                        store.StoreAddress = newStoreAddress;
+                    if (!String.IsNullOrEmpty(itemCode))
+                        item.ItemCode = itemCode;
+                    if (!String.IsNullOrEmpty(itemDescription))
+                        item.ItemDescription = itemDescription;
+                    if(itemPrice.HasValue)
+                        item.ItemPrice = itemPrice.Value;
+                    if(itemStock.HasValue)
+                        item.ItemStock = itemStock.Value;
+                    if (itemImg != null && itemImg.Length > 0)
+                    {
+                        using (var ms = new System.IO.MemoryStream())
+                        {
+                            await itemImg.CopyToAsync(ms);
+                            item.ItemImg = ms.ToArray();
+                        }
+                    }
 
                     // map the store object to custom store model for validation
-                    var updatedStore = Mapster.TypeAdapter.Adapt<Store>(store);
-                    this.ValidateModel(updatedStore);
+                    var updatedItem = Mapster.TypeAdapter.Adapt<Item>(item);
+                    this.ValidateModel(updatedItem);
                     // update the store
-                    context.Stores.Update(store);
+                    context.Items.Update(item);
                     await context.SaveChangesAsync();
                     // return the result
-                    return new CustomResponse(statusCode: StatusCodes.Status200OK, message: "Updated store successfully.", clientId: clientId, sessionId: sessionId);
+                    return new CustomResponse(statusCode: StatusCodes.Status200OK, message: "Updated item successfully.", clientId: clientId, sessionId: sessionId);
 
 
                 }
@@ -134,28 +157,28 @@ namespace StoreManagementService.BusinessLogic
             }
         }
 
-        public async Task<CustomResponse> DeleteStore(Guid clientId, Guid sessionId, Guid storeId)
+        public async Task<CustomResponse> DeleteItem(Guid clientId, Guid sessionId, Guid itemId)
         {
             try
             {
                 await this.ValidateSession(clientId, sessionId);
                 using (var context = new StoreManagementService.Models.StoreManagementContext())
                 {
-                    // find the Store by StoreId
-                    var store = await context.Stores
-                    .FirstOrDefaultAsync(u => u.StoreId == storeId && u.IsDeleted == false);
-                    if (store == null)
+                    // find the Item by StoreId
+                    var item = await context.Items
+                    .FirstOrDefaultAsync(u => u.ItemId == itemId && u.IsDeleted == false);
+                    if (item == null)
                     {
-                        var exception = this._errorService.GetError("OMS-STORE-NOTFOUND-ERROR");
+                        var exception = this._errorService.GetError("OMS-ITEM-NOTFOUND-ERROR");
                         throw new OperationException(errorCode: exception.Code, message: exception.Message, details: exception.Details, sessionId: sessionId);
                     }
 
-                    // mark the Store as deleted
-                    store.IsDeleted = true;
-                    context.Stores.Update(store);
+                    // mark the Item as deleted
+                    item.IsDeleted = true;
+                    context.Items.Update(item);
                     await context.SaveChangesAsync();
                     // return the result
-                    return new CustomResponse(statusCode: StatusCodes.Status200OK, message: "Deleted store successfully.", clientId: clientId, sessionId: sessionId);
+                    return new CustomResponse(statusCode: StatusCodes.Status200OK, message: "Deleted item successfully.", clientId: clientId, sessionId: sessionId);
                 }
             }
             catch (Exception ex)

@@ -3,6 +3,7 @@ using ExceptionsManagement;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using StoreManagementService.BusinessLogic;
+using StoreManagementService.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -12,28 +13,28 @@ namespace StoreManagementService.Controllers.Implementation
 {
     [ApiVersion("0.1")]
     [ApiController]
-    public class StoresImplementationController : StoresControllerBase
+    public class ItemsImplementationController : ItemsControllerBase
     {
-        private readonly StoreFunctionality _storeFunctionality;
+        private readonly ItemFunctionality _itemFunctionality;
         private readonly ServiceBaseFunctionality _serviceBaseFunctionality;
         private readonly ErrorServiceModel _errorService = new ErrorServiceModel();
-        public StoresImplementationController(StoreFunctionality storeFunctionality, ServiceBaseFunctionality serviceBaseFunctionality)
+        public ItemsImplementationController(ItemFunctionality itemFunctionality, ServiceBaseFunctionality serviceBaseFunctionality)
         {
-            _storeFunctionality = storeFunctionality;
+            _itemFunctionality = itemFunctionality;
             _serviceBaseFunctionality = serviceBaseFunctionality;
             _errorService = new ErrorServiceModel();
         }
 
         [HttpPost]
-        [Route("~/{version::apiVersion}/Stores/AddStore")]
-        public async override Task<IActionResult> AddStore([FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required] string version, [Required] Guid clientId, [Required] Guid sessionId, [Required] string storeBranch, [Required] string storeAddress)
+        [Route("~/{version::apiVersion}/Items/AddItem")]
+        public async override Task<IActionResult> AddItem([FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required] string version, [Required] Guid clientId, [Required] Guid sessionId, [Required] string itemCode, [Required] string itemDescription, [Required] decimal itemPrice, [Required] IFormFile itemImg, [Required] int itemStock)
         {
             // Log the request
-            Dictionary<string, object> request = new Dictionary<string, object> { { "CreateNewStoreRequest", new object[] { "version: " + version, "clientId: " + clientId, "sessionId: " + sessionId, "storeBranch: " + storeBranch, "storeAddress: " + storeAddress } } };
+            Dictionary<string, object> request = new Dictionary<string, object> { { "CreateNewStoreRequest", new object[] { "version: " + version, "clientId: " + clientId, "sessionId: " + sessionId } } };
             try
             {
                 // Call the implementation
-                var result = await _storeFunctionality.addStore(clientId, sessionId, storeBranch, storeAddress);
+                var result = await _itemFunctionality.addItem(clientId, sessionId, itemCode, itemDescription, itemPrice, itemImg, itemStock);
                 // Log the response
                 Dictionary<string, object> response = new Dictionary<string, object> { { "CreateNewStoreResponse", result } };
                 // Log the operation
@@ -53,26 +54,26 @@ namespace StoreManagementService.Controllers.Implementation
         }
 
         [HttpGet]
-        [Route("~/{version::apiVersion}/Stores/GetStore")]
-        public async override Task<IActionResult> GetStore([FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required] string version, [Required] Guid clientId, [Required] Guid sessionId, Guid? storeId = null)
+        [Route("~/{version::apiVersion}/Items/GetItem")]
+        public async override Task<IActionResult> GetItem([FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required] string version, [Required] Guid clientId, [Required] Guid sessionId, Guid? itemId = null)
         {
             // Log the request
-            Dictionary<string, object> request = new Dictionary<string, object> { { "GetStoreRequest", new object[] { "version: " + version, "clientId: " + clientId, "sessionId: " + sessionId, "storeId: " + storeId } } };
+            Dictionary<string, object> request = new Dictionary<string, object> { { "GetItemRequest", new object[] { "version: " + version, "clientId: " + clientId, "sessionId: " + sessionId, "itemId: " + itemId } } };
             try
             {
                 // log the operation
                 var operationId = await _serviceBaseFunctionality.LogOperation(request, new Dictionary<string, object>(), sessionId);
                 // Call the implementation
-                var result = await _storeFunctionality.GetStore(clientId, sessionId, storeId);
+                var result = await _itemFunctionality.GetItem(clientId, sessionId, itemId);
                 // Update the operation log
-                await _serviceBaseFunctionality.UpdateOperation((int)operationId.Data, request, new Dictionary<string, object> { { "GetStoreRequest", result } }, sessionId);
+                await _serviceBaseFunctionality.UpdateOperation((int)operationId.Data, request, new Dictionary<string, object> { { "GetItemRequest", result } }, sessionId);
                 // return the result
                 return Ok(new CustomResponse(statusCode: StatusCodes.Status200OK, message: result.Message, clientId: result.ClientId, sessionId: sessionId, data: result.Data));
             }
             catch (Exception ex)
             {
                 // Log the exception
-                Dictionary<string, object> response = new Dictionary<string, object> { { "ErrorGetStoreResponse", ex } };
+                Dictionary<string, object> response = new Dictionary<string, object> { { "ErrorGetItemResponse", ex } };
                 await _serviceBaseFunctionality.LogOperation(request, response, sessionId);
                 // if the exception is an OperationException, return a bad request with the error details
                 OperationException excep = ((OperationException)ex);
@@ -81,17 +82,17 @@ namespace StoreManagementService.Controllers.Implementation
         }
 
         [HttpPut]
-        [Route("~/{version::apiVersion}/Stores/UpdateStore")]
-        public async override Task<IActionResult> UpdateStore([FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required] string version, [Required] Guid clientId, [Required] Guid sessionId, [Required] Guid storeId, string newStoreBranch = null, string newStoreAddress = null)
+        [Route("~/{version::apiVersion}/Items/UpdateItem")]
+        public async override Task<IActionResult> UpdateItem([FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required] string version, [Required] Guid clientId, [Required] Guid sessionId, [Required] Guid itemId, string itemCode = null, string itemDescription = null, decimal? itemPrice = null, IFormFile itemImg = null, int? itemStock = null)
         {
             // Log the request
-            Dictionary<string, object> request = new Dictionary<string, object> { { "UpdateStoreRequest", new object[] { "version: " + version, "clientId: " + clientId, "sessionId: " + sessionId, "storeId: " + storeId, "newStoreBranch: " + newStoreBranch, "newStoreAddress: " + newStoreAddress } } };
+            Dictionary<string, object> request = new Dictionary<string, object> { { "UpdateItemRequest", new object[] { "version: " + version, "clientId: " + clientId, "sessionId: " + sessionId, "itemId: " + itemId, "itemCode: " + itemCode, "itemDescription: " + itemDescription, "itemPrice: " + itemPrice, "itemImg: " + (itemImg != null), "itemStock: " + itemStock } } };
             try
             {
                 // Call the implementation
-                var result = await _storeFunctionality.UpdateStore(clientId, sessionId, storeId, newStoreBranch, newStoreAddress);
+                var result = await _itemFunctionality.UpdateItem(clientId, sessionId, itemId, itemCode, itemDescription, itemPrice, itemImg, itemStock);
                 // Log the response
-                Dictionary<string, object> response = new Dictionary<string, object> { { "UpdateStoreResponse", result } };
+                Dictionary<string, object> response = new Dictionary<string, object> { { "UpdateItemResponse", result } };
                 // Log the operation
                 await _serviceBaseFunctionality.LogOperation(request, response, sessionId);
                 // return the result
@@ -100,7 +101,7 @@ namespace StoreManagementService.Controllers.Implementation
             catch (Exception ex)
             {
                 // Log the exception
-                Dictionary<string, object> response = new Dictionary<string, object> { { "ErrorUpdateStoreResponse", ex } };
+                Dictionary<string, object> response = new Dictionary<string, object> { { "ErrorUpdateItemResponse", ex } };
                 await _serviceBaseFunctionality.LogOperation(request, response, sessionId);
                 // if the exception is an OperationException, return a bad request with the error details
                 OperationException excep = ((OperationException)ex);
@@ -109,17 +110,17 @@ namespace StoreManagementService.Controllers.Implementation
         }
 
         [HttpDelete]
-        [Route("~/{version::apiVersion}/Stores/DeleteStore")]
-        public async override Task<IActionResult> DeleteStore([FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required] string version, [Required] Guid clientId, [Required] Guid sessionId, Guid storeId)
+        [Route("~/{version::apiVersion}/Items/DeleteItem")]
+        public async override Task<IActionResult> DeleteItem([FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required] string version, [Required] Guid clientId, [Required] Guid sessionId, Guid itemId)
         {
             // Log the request
-            Dictionary<string, object> request = new Dictionary<string, object> { { "DeleteStoreRequest", new object[] { "version: " + version, "clientId: " + clientId, "sessionId: " + sessionId } } };
+            Dictionary<string, object> request = new Dictionary<string, object> { { "DeleteItemRequest", new object[] { "version: " + version, "clientId: " + clientId, "sessionId: " + sessionId } } };
             try
             {
                 // Call the implementation
-                var result = await _storeFunctionality.DeleteStore(clientId, sessionId, storeId);
+                var result = await _itemFunctionality.DeleteItem(clientId, sessionId, itemId);
                 // Log the response
-                Dictionary<string, object> response = new Dictionary<string, object> { { "DeleteStoreResponse", result } };
+                Dictionary<string, object> response = new Dictionary<string, object> { { "DeleteItemResponse", result } };
                 // Log the operation
                 await _serviceBaseFunctionality.LogOperation(request, response, sessionId);
                 // return the result
@@ -128,7 +129,7 @@ namespace StoreManagementService.Controllers.Implementation
             catch (Exception ex)
             {
                 // Log the exception
-                Dictionary<string, object> response = new Dictionary<string, object> { { "ErrorDeleteStoreResponse", ex } };
+                Dictionary<string, object> response = new Dictionary<string, object> { { "ErrorDeleteItemResponse", ex } };
                 await _serviceBaseFunctionality.LogOperation(request, response, sessionId);
                 // if the exception is an OperationException, return a bad request with the error details
                 OperationException excep = ((OperationException)ex);
