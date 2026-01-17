@@ -41,8 +41,9 @@ namespace StoreManagementService
             });
 
             services.AddScoped<ServiceBaseFunctionality>();
-            services.AddScoped<UserFunctionality>();
+            services.AddScoped<ClientFunctionality>();
             services.AddScoped<ErrorServiceModel>();
+            services.AddScoped<StoreFunctionality>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

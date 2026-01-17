@@ -14,12 +14,12 @@ namespace StoreManagementService.Controllers.Implementation
     [ApiController]
     public class ClientsImplementationController : ClientsControllerBase
     {
-        private readonly UserFunctionality _userFunctionality;
+        private readonly ClientFunctionality _clientFunctionality;
         private readonly ServiceBaseFunctionality _serviceBaseFunctionality;
         private readonly ErrorServiceModel _errorService = new ErrorServiceModel();
-        public ClientsImplementationController(UserFunctionality userFunctionality, ServiceBaseFunctionality serviceBaseFunctionality)
+        public ClientsImplementationController(ClientFunctionality clientFunctionality, ServiceBaseFunctionality serviceBaseFunctionality)
         {
-            _userFunctionality = userFunctionality;
+            _clientFunctionality = clientFunctionality;
             _serviceBaseFunctionality = serviceBaseFunctionality;
             _errorService = new ErrorServiceModel();
         }
@@ -33,7 +33,7 @@ namespace StoreManagementService.Controllers.Implementation
             try
             {
                 // Call the implementation
-                var result = await _userFunctionality.AddClient(userName, clientName, clientLastName, clientAddress, password);
+                var result = await _clientFunctionality.AddClient(userName, clientName, clientLastName, clientAddress, password);
                 // Log the response
                 Dictionary<string, object> response = new Dictionary<string, object> { { "CreateNewUserResponse", result } };
                 // Log the operation
@@ -61,7 +61,7 @@ namespace StoreManagementService.Controllers.Implementation
             try
             {
                 // Call the implementation
-                var result = await _userFunctionality.LoginUser(userName, password);
+                var result = await _clientFunctionality.LoginUser(userName, password);
                 // Log the response
                 var sessionLogResponse = await _serviceBaseFunctionality.InitSession(result.ClientId);
                 Dictionary<string, object> response = new Dictionary<string, object> { { "LoginResponse", result }, { "SessionLogResponse", sessionLogResponse } };
@@ -81,6 +81,34 @@ namespace StoreManagementService.Controllers.Implementation
             }
         }
 
+        [HttpPut]
+        [Route("~/{version::apiVersion}/Clients/UpdateClient")]
+        public async override Task<IActionResult> UpdateClient([FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required] string version, [Required] Guid clientId, [Required] Guid sessionId, [Required] string currentPassword, string newPassword = null, string userName = null, string newClientName = null, string newClientLastName = null, string newClientAddress = null)
+        {
+            // Log the request
+            Dictionary<string, object> request = new Dictionary<string, object> { { "UpdateUserRequest", new object[] { "version: " + version, "clientId: " + clientId, "sessionId: " + sessionId, "newPassword: " + !String.IsNullOrEmpty(newPassword), "newUserName: " + !String.IsNullOrEmpty(userName), "newClientName: " + !String.IsNullOrEmpty(newClientName), "newClientLastName: " + !String.IsNullOrEmpty(newClientLastName), "newClientAddress: " + !String.IsNullOrEmpty(newClientAddress) } } };
+            try
+            {
+                // Call the implementation
+                var result = await _clientFunctionality.UpdateUser(clientId, sessionId, currentPassword, newPassword, userName, newClientName, newClientLastName, newClientAddress);
+                // Log the response
+                Dictionary<string, object> response = new Dictionary<string, object> { { "UpdateUserResponse", result } };
+                // Log the operation
+                await _serviceBaseFunctionality.LogOperation(request, response, sessionId);
+                // return the result
+                return Ok(new CustomResponse(statusCode: StatusCodes.Status200OK, message: result.Message, clientId: result.ClientId, sessionId: sessionId));
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                Dictionary<string, object> response = new Dictionary<string, object> { { "ErrorUpdateUserResponse", ex } };
+                await _serviceBaseFunctionality.LogOperation(request, response, sessionId);
+                // if the exception is an OperationException, return a bad request with the error details
+                OperationException excep = ((OperationException)ex);
+                return this.BadRequest(new { StatusCode = StatusCodes.Status400BadRequest, code = excep.ErrorCode, message = excep.Message, details = excep.Details });
+            }
+        }
+
         [HttpDelete]
         [Route("~/{version::apiVersion}/Clients/DeleteUser")]
         public async override Task<IActionResult> DeleteClient([FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required] string version, [Required] Guid clientId, [Required] Guid sessionId)
@@ -90,7 +118,7 @@ namespace StoreManagementService.Controllers.Implementation
             try
             {
                 // Call the implementation
-                var result = await _userFunctionality.DeleteClient(clientId, sessionId);
+                var result = await _clientFunctionality.DeleteClient(clientId, sessionId);
                 // close all sessions for the user
                 var sessionLogResponse = _serviceBaseFunctionality.CloseAllSession(clientId, sessionId);
                 // Log the response
@@ -104,34 +132,6 @@ namespace StoreManagementService.Controllers.Implementation
             {
                 // Log the exception
                 Dictionary<string, object> response = new Dictionary<string, object> { { "ErrorDeleteClientResponse", ex } };
-                await _serviceBaseFunctionality.LogOperation(request, response, sessionId);
-                // if the exception is an OperationException, return a bad request with the error details
-                OperationException excep = ((OperationException)ex);
-                return this.BadRequest(new { StatusCode = StatusCodes.Status400BadRequest, code = excep.ErrorCode, message = excep.Message, details = excep.Details });
-            }
-        }
-
-        [HttpPut]
-        [Route("~/{version::apiVersion}/Clients/UpdateClient")]
-        public async override Task<IActionResult> UpdateClient([FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required] string version, [Required] Guid userId, [Required] Guid sessionId, [Required] string currentPassword, string newPassword = null, string userName = null, string newClientName = null, string newClientLastName = null, string newClientAddress = null)
-        {
-            // Log the request
-            Dictionary<string, object> request = new Dictionary<string, object> { { "UpdateUserRequest", new object[] { "version: " + version, "userId: " + userId, "sessionId: " + sessionId, "newPassword: " + !String.IsNullOrEmpty(newPassword), "newUserName: " + !String.IsNullOrEmpty(userName), "newClientName: " + !String.IsNullOrEmpty(newClientName), "newClientLastName: " + !String.IsNullOrEmpty(newClientLastName), "newClientAddress: " + !String.IsNullOrEmpty(newClientAddress) } } };
-            try
-            {
-                // Call the implementation
-                var result = await _userFunctionality.UpdateUser(userId, sessionId, currentPassword, newPassword, userName, newClientName, newClientLastName, newClientAddress);
-                // Log the response
-                Dictionary<string, object> response = new Dictionary<string, object> { { "UpdateUserResponse", result } };
-                // Log the operation
-                await _serviceBaseFunctionality.LogOperation(request, response, sessionId);
-                // return the result
-                return Ok(new CustomResponse(statusCode: StatusCodes.Status200OK, message: result.Message, clientId: result.ClientId, sessionId: sessionId));
-            }
-            catch (Exception ex)
-            {
-                // Log the exception
-                Dictionary<string, object> response = new Dictionary<string, object> { { "ErrorUpdateUserResponse", ex } };
                 await _serviceBaseFunctionality.LogOperation(request, response, sessionId);
                 // if the exception is an OperationException, return a bad request with the error details
                 OperationException excep = ((OperationException)ex);
