@@ -24,12 +24,12 @@ namespace StoreManagementService.Models
         public virtual DbSet<OperationLog> OperationLogs { get; set; }
         public virtual DbSet<SessionLog> SessionLogs { get; set; }
         public virtual DbSet<Store> Stores { get; set; }
-        public virtual DbSet<User> Users { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
             {
+                // get connection string from environment variable
                 string ConnectionStrings = System.Environment.GetEnvironmentVariable("ConnectionStrings");
 
                 optionsBuilder.UseSqlServer(ConnectionStrings);
@@ -42,6 +42,12 @@ namespace StoreManagementService.Models
 
             modelBuilder.Entity<Client>(entity =>
             {
+                entity.HasIndex(e => e.ClientName, "UQ__Clients__65800DA0DFBA360C")
+                    .IsUnique();
+
+                entity.HasIndex(e => e.UserName, "UQ__Clients__C9F284566E2AAB1A")
+                    .IsUnique();
+
                 entity.Property(e => e.ClientId)
                     .ValueGeneratedNever()
                     .HasColumnName("ClientID");
@@ -52,13 +58,17 @@ namespace StoreManagementService.Models
                     .IsRequired()
                     .HasMaxLength(100);
 
-                entity.Property(e => e.ClientName)
-                    .IsRequired()
-                    .HasMaxLength(50);
+                entity.Property(e => e.ClientName).HasMaxLength(50);
 
                 entity.Property(e => e.IsDeleted)
                     .HasColumnName("isDeleted")
                     .HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.PasswordHash).IsRequired();
+
+                entity.Property(e => e.PasswordSalst).IsRequired();
+
+                entity.Property(e => e.UserName).HasMaxLength(50);
             });
 
             modelBuilder.Entity<Item>(entity =>
@@ -99,12 +109,12 @@ namespace StoreManagementService.Models
                 entity.HasOne(d => d.Client)
                     .WithMany(p => p.ItemsClientsRelationships)
                     .HasForeignKey(d => d.ClientId)
-                    .HasConstraintName("FK__ItemsClie__Clien__34C8D9D1");
+                    .HasConstraintName("FK__ItemsClie__Clien__32E0915F");
 
                 entity.HasOne(d => d.Item)
                     .WithMany(p => p.ItemsClientsRelationships)
                     .HasForeignKey(d => d.ItemId)
-                    .HasConstraintName("FK__ItemsClie__ItemI__35BCFE0A");
+                    .HasConstraintName("FK__ItemsClie__ItemI__33D4B598");
             });
 
             modelBuilder.Entity<ItemsStoresRelationship>(entity =>
@@ -124,18 +134,18 @@ namespace StoreManagementService.Models
                 entity.HasOne(d => d.Item)
                     .WithMany(p => p.ItemsStoresRelationships)
                     .HasForeignKey(d => d.ItemId)
-                    .HasConstraintName("FK__ItemsStor__ItemI__30F848ED");
+                    .HasConstraintName("FK__ItemsStor__ItemI__2F10007B");
 
                 entity.HasOne(d => d.Store)
                     .WithMany(p => p.ItemsStoresRelationships)
                     .HasForeignKey(d => d.StoreId)
-                    .HasConstraintName("FK__ItemsStor__Store__31EC6D26");
+                    .HasConstraintName("FK__ItemsStor__Store__300424B4");
             });
 
             modelBuilder.Entity<OperationLog>(entity =>
             {
                 entity.HasKey(e => e.OperationId)
-                    .HasName("PK__Operatio__A4F5FC6459151972");
+                    .HasName("PK__Operatio__A4F5FC644CE71531");
 
                 entity.ToTable("OperationLog");
 
@@ -148,13 +158,13 @@ namespace StoreManagementService.Models
                 entity.HasOne(d => d.Session)
                     .WithMany(p => p.OperationLogs)
                     .HasForeignKey(d => d.SessionId)
-                    .HasConstraintName("FK__Operation__Respo__3B75D760");
+                    .HasConstraintName("FK__Operation__Respo__398D8EEE");
             });
 
             modelBuilder.Entity<SessionLog>(entity =>
             {
                 entity.HasKey(e => e.SessionId)
-                    .HasName("PK__SessionL__C9F49270716ED46C");
+                    .HasName("PK__SessionL__C9F492705C34A587");
 
                 entity.ToTable("SessionLog");
 
@@ -162,16 +172,16 @@ namespace StoreManagementService.Models
                     .ValueGeneratedNever()
                     .HasColumnName("SessionID");
 
+                entity.Property(e => e.ClientId).HasColumnName("ClientID");
+
                 entity.Property(e => e.EndSession).HasColumnType("datetime");
 
                 entity.Property(e => e.InitSession).HasColumnType("datetime");
 
-                entity.Property(e => e.UserId).HasColumnName("UserID");
-
-                entity.HasOne(d => d.User)
+                entity.HasOne(d => d.Client)
                     .WithMany(p => p.SessionLogs)
-                    .HasForeignKey(d => d.UserId)
-                    .HasConstraintName("FK__SessionLo__EndSe__38996AB5");
+                    .HasForeignKey(d => d.ClientId)
+                    .HasConstraintName("FK__SessionLo__EndSe__36B12243");
             });
 
             modelBuilder.Entity<Store>(entity =>
@@ -191,26 +201,6 @@ namespace StoreManagementService.Models
                 entity.Property(e => e.StoreBranch)
                     .IsRequired()
                     .HasMaxLength(50);
-            });
-
-            modelBuilder.Entity<User>(entity =>
-            {
-                entity.HasIndex(e => e.UserName, "UQ__Users__C9F2845605837938")
-                    .IsUnique();
-
-                entity.Property(e => e.UserId)
-                    .ValueGeneratedNever()
-                    .HasColumnName("UserID");
-
-                entity.Property(e => e.IsDeleted)
-                    .HasColumnName("isDeleted")
-                    .HasDefaultValueSql("((0))");
-
-                entity.Property(e => e.PasswordHash).IsRequired();
-
-                entity.Property(e => e.PasswordSalst).IsRequired();
-
-                entity.Property(e => e.UserName).HasMaxLength(50);
             });
 
             OnModelCreatingPartial(modelBuilder);

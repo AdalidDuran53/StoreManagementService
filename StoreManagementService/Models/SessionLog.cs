@@ -13,11 +13,11 @@ namespace StoreManagementService.Models
         }
 
         public Guid SessionId { get; set; }
-        public Guid? UserId { get; set; }
+        public Guid? ClientId { get; set; }
         public DateTime InitSession { get; set; }
         public DateTime? EndSession { get; set; }
 
-        public virtual User User { get; set; }
+        public virtual Client Client { get; set; }
         public virtual ICollection<OperationLog> OperationLogs { get; set; }
     }
 }

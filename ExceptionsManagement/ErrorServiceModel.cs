@@ -56,6 +56,21 @@ namespace ExceptionsManagement
                 code: "OMS-PASSWORD-ERROR",
                 message: "Invalid Password.",
                 details: "Password is not valid."));
+
+            errors.Add("OMS-CLIENTNAME-ERROR", new ErroritemServiceModel(
+                code: "OMS-CLIENTNAME-ERROR",
+                message: "Invalid Client name.",
+                details: "Client name is not valid."));
+
+            errors.Add("OMS-CLIENTLASTNAME-ERROR", new ErroritemServiceModel(
+                code: "OMS-CLIENTLASTNAME-ERROR",
+                message: "Invalid Client last name.",
+                details: "Client last name is not valid."));
+
+            errors.Add("OMS-CLIENTADDRESS-ERROR", new ErroritemServiceModel(
+                code: "OMS-CLIENTADDRESS-ERROR",
+                message: "Invalid Client address.",
+                details: "Client address is not valid."));
             #endregion
 
             #region Session

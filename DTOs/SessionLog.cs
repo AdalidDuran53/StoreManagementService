@@ -11,21 +11,21 @@ namespace DTOs
         {
         }
 
-        public SessionLog(Guid sessionId, Guid? userId, DateTime initSession)
+        public SessionLog(Guid sessionId, Guid? clientId, DateTime initSession)
         {
             this.SessionId = sessionId;
-            this.UserId = userId;
+            this.ClientId = clientId;
             this.InitSession = initSession;
         }
         public Guid SessionId { get; set; }
 
-        public Guid? UserId { get; set; }
+        public Guid? ClientId { get; set; }
 
         public DateTime InitSession { get; set; }
 
         public DateTime? EndSession { get; set; }
 
-        public virtual User? User { get; set; }
+        public virtual Client? User { get; set; }
 
         public string Validate(string operationExceptionCode)
         {

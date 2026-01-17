@@ -1,27 +1,25 @@
 -- Feature: SMS-3 
 -- Author: Adalid
 -- Purpose: Create a new database
+-- UPDATES: 
+-- * SMS-9 updated schema
 CREATE DATABASE StoreManagement
 GO
 
 USE StoreManagement;
 --****************************** TABLE FOR LOGIN ******************************
-CREATE TABLE StoreManagement.dbo.Users (
-    UserID UNIQUEIDENTIFIER PRIMARY KEY, -- UserID, must be UNIQUEIDENTIFIER
+CREATE TABLE StoreManagement.dbo.Clients (
+    ClientID UNIQUEIDENTIFIER PRIMARY KEY, -- UserID, must be UNIQUEIDENTIFIER
     UserName NVARCHAR(50) UNIQUE,         -- User name, must be UNIQUE
+    ClientName NVARCHAR(50) UNIQUE,         -- User name, must be UNIQUE
+	ClientLastName NVARCHAR(100)  NOT NULL,		-- required
+    ClientAddress NVARCHAR(MAX) NOT NULL,		-- required
     PasswordHash NVARCHAR(MAX) NOT NULL,          -- PasswordHash, required
     PasswordSalst NVARCHAR(MAX) NOT NULL,          -- PasswordHash, required
     isDeleted BIT DEFAULT 0 -- isDeleted, DEFAULT 0 => isDeleted = false
 );
 
 --****************************** TABLES FOR GENERAL DATA ******************************
-CREATE TABLE StoreManagement.dbo.Clients (
-    ClientID UNIQUEIDENTIFIER PRIMARY KEY, -- ClientID, must be UNIQUEIDENTIFIER
-    ClientName NVARCHAR(50)  NOT NULL,			-- required
-	ClientLastName NVARCHAR(100)  NOT NULL,		-- required
-    ClientAddress NVARCHAR(MAX) NOT NULL,		-- required
-    isDeleted BIT DEFAULT 0 -- isDeleted, DEFAULT 0 => isDeleted = false
-);
 
 CREATE TABLE StoreManagement.dbo.Stores (
     StoreID UNIQUEIDENTIFIER PRIMARY KEY, -- UserID, must be UNIQUEIDENTIFIER
@@ -63,10 +61,10 @@ CREATE TABLE StoreManagement.dbo.ItemsClientsRelationship (
 --****************************** CONTROL TABLES ******************************
 CREATE TABLE StoreManagement.dbo.SessionLog (
     SessionID UNIQUEIDENTIFIER PRIMARY KEY, 
-    UserID UNIQUEIDENTIFIER,         -- Foreign key
+    ClientID UNIQUEIDENTIFIER,         -- Foreign key
     InitSession DATETIME NOT NULL,          
-    EndSession DATETIME 
-    FOREIGN KEY (UserID) REFERENCES Users(UserID)
+    EndSession DATETIME
+    FOREIGN KEY (ClientID) REFERENCES Clients(ClientID)
 );
 
 CREATE TABLE StoreManagement.dbo.OperationLog (
