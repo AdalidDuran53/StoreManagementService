@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Swashbuckle.AspNetCore.Annotations;
 using System;
@@ -12,34 +13,34 @@ namespace StoreManagementService.Controllers
     [ApiController]
     [ApiVersion("0.1")]
     [Route("[controller]")]
-    public abstract class StoresControllerBase : ControllerBase
+    public abstract class ItemsControllerBase : ControllerBase
     {
         [HttpPost]
-        [Route("~/{version}/Stores/")]
+        [Route("~/{version}/Items/")]
         [SwaggerResponse(statusCode: 200, type: typeof(ActionResult), description: "Ok")]
         [SwaggerResponse(statusCode: 400, type: typeof(ActionResult), description: "Bab Request")]
         [SwaggerResponse(statusCode: 401, type: typeof(ActionResult), description: "Unauthorized")]
-        public abstract Task<IActionResult> AddStore([FromRoute][Required][RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$")] string version, [Required] Guid clientId, [Required] Guid sessionId, [Required] string storeBranch, [Required] string storeAddress);
+        public abstract Task<IActionResult> AddItem([FromRoute][Required][RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$")] string version, [Required] Guid clientId, [Required] Guid sessionId, [Required] string itemCode, [Required] string itemDescription, [Required] decimal itemPrice, [Required] IFormFile itemImg, [Required] int itemStock);
 
         [HttpPost]
-        [Route("~/{version}/Stores/")]
+        [Route("~/{version}/Items/")]
         [SwaggerResponse(statusCode: 200, type: typeof(ActionResult), description: "Ok")]
         [SwaggerResponse(statusCode: 400, type: typeof(ActionResult), description: "Bab Request")]
         [SwaggerResponse(statusCode: 401, type: typeof(ActionResult), description: "Unauthorized")]
-        public abstract Task<IActionResult> GetStore([FromRoute][Required][RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$")] string version, [Required] Guid clientId, [Required] Guid sessionId, Guid? storeId = null);
+        public abstract Task<IActionResult> GetItem([FromRoute][Required][RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$")] string version, [Required] Guid clientId, [Required] Guid sessionId, Guid? itemId = null);
 
         [HttpPut]
-        [Route("~/{version}/Stores/")]
+        [Route("~/{version}/Items/")]
         [SwaggerResponse(statusCode: 200, type: typeof(ActionResult), description: "Ok")]
         [SwaggerResponse(statusCode: 400, type: typeof(ActionResult), description: "Bab Request")]
         [SwaggerResponse(statusCode: 401, type: typeof(ActionResult), description: "Unauthorized")]
-        public abstract Task<IActionResult> UpdateStore([FromRoute][Required][RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$")] string version, [Required] Guid clientId, [Required] Guid sessionId, [Required] Guid storeId, string newStoreBranch = null,  string newStoreAddress = null);
+        public abstract Task<IActionResult> UpdateItem([FromRoute][Required][RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$")] string version, [Required] Guid clientId, [Required] Guid sessionId, [Required] Guid itemId,  string itemCode = null, string itemDescription = null, decimal? itemPrice = null, IFormFile itemImg = null, int? itemStock = null);
 
         [HttpDelete]
-        [Route("~/{version}/Stores/")]
+        [Route("~/{version}/Items/")]
         [SwaggerResponse(statusCode: 200, type: typeof(ActionResult), description: "Ok")]
         [SwaggerResponse(statusCode: 400, type: typeof(ActionResult), description: "Bab Request")]
         [SwaggerResponse(statusCode: 401, type: typeof(ActionResult), description: "Unauthorized")]
-        public abstract Task<IActionResult> DeleteStore([FromRoute][Required][RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$")] string version, [Required] Guid clientId, [Required] Guid sessionId, Guid storeId);
+        public abstract Task<IActionResult> DeleteItem([FromRoute][Required][RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$")] string version, [Required] Guid clientId, [Required] Guid sessionId, Guid itemId);
     }
 }

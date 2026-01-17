@@ -42,10 +42,10 @@ namespace StoreManagementService.Models
 
             modelBuilder.Entity<Client>(entity =>
             {
-                entity.HasIndex(e => e.ClientName, "UQ__Clients__65800DA0DFBA360C")
+                entity.HasIndex(e => e.ClientName, "UQ__Clients__65800DA05A5AB222")
                     .IsUnique();
 
-                entity.HasIndex(e => e.UserName, "UQ__Clients__C9F284566E2AAB1A")
+                entity.HasIndex(e => e.UserName, "UQ__Clients__C9F28456DDDA6553")
                     .IsUnique();
 
                 entity.Property(e => e.ClientId)
@@ -80,6 +80,10 @@ namespace StoreManagementService.Models
                 entity.Property(e => e.IsDeleted)
                     .HasColumnName("isDeleted")
                     .HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.ItemCode)
+                    .IsRequired()
+                    .HasMaxLength(50);
 
                 entity.Property(e => e.ItemDescription)
                     .IsRequired()
@@ -145,7 +149,7 @@ namespace StoreManagementService.Models
             modelBuilder.Entity<OperationLog>(entity =>
             {
                 entity.HasKey(e => e.OperationId)
-                    .HasName("PK__Operatio__A4F5FC644CE71531");
+                    .HasName("PK__Operatio__A4F5FC64DA79D0A9");
 
                 entity.ToTable("OperationLog");
 
@@ -164,7 +168,7 @@ namespace StoreManagementService.Models
             modelBuilder.Entity<SessionLog>(entity =>
             {
                 entity.HasKey(e => e.SessionId)
-                    .HasName("PK__SessionL__C9F492705C34A587");
+                    .HasName("PK__SessionL__C9F492701D57D51A");
 
                 entity.ToTable("SessionLog");
 

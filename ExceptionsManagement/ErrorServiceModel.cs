@@ -102,6 +102,23 @@ namespace ExceptionsManagement
                 message: "Invalid Store.",
                 details: "Store is not valid."));
             #endregion
+
+            #region Item
+            errors.Add("OMS-ITEMCODE-ERROR", new ErroritemServiceModel(
+                code: "OMS-ITEMCODE-ERROR",
+                message: "Invalid Item code.",
+                details: "Item code is not valid."));
+
+            errors.Add("OMS-ITEMDESCRIPTION-ERROR", new ErroritemServiceModel(
+                code: "OMS-ITEMDESCRIPTION-ERROR",
+                message: "Invalid Item description.",
+                details: "Item description is not valid."));
+
+            errors.Add("OMS-ITEM-NOTFOUND-ERROR", new ErroritemServiceModel(
+                code: "OMS-ITEM-NOTFOUND-ERROR",
+                message: "Invalid Item.",
+                details: "Item is not valid."));
+            #endregion
         }
     }
 }
