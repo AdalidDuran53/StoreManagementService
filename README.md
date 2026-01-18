@@ -11,6 +11,8 @@ Modular service for store management, designed with clean architecture, reusable
 ---
 
 🧱 Project Structure
+
+```plaintext
 ├── DTOs/                       # Custom and keyless models
 ├── ExceptionsManagement/       # Controlled exceptions and helpers
 ├── StoreManagementService/     # Implementation and business rules
