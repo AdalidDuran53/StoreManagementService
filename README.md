@@ -11,10 +11,10 @@ Modular service for store management, designed with clean architecture, reusable
 ---
 
 🧱 Project Structure
-├── DTOs/                       # # Custom and keyless models
+├── DTOs/                       # Custom and keyless models
 ├── ExceptionsManagement/       # Controlled exceptions and helpers
 ├── StoreManagementService/     # Implementation and business rules
 ├── database/                   # Database scripts
-├── StoreManagementService.sln  # Solution file
+├── StoreManagementService.sln   # Solution file
 └── .gitignore                  # Git ignore rules
 
