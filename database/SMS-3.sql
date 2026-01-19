@@ -11,7 +11,7 @@ USE StoreManagement;
 CREATE TABLE StoreManagement.dbo.Clients (
     ClientID UNIQUEIDENTIFIER PRIMARY KEY, -- UserID, must be UNIQUEIDENTIFIER
     UserName NVARCHAR(50) UNIQUE,         -- User name, must be UNIQUE
-    ClientName NVARCHAR(50) UNIQUE,         -- User name, must be UNIQUE
+    ClientName NVARCHAR(50)  NOT NULL,         -- User name, must be UNIQUE
 	ClientLastName NVARCHAR(100) NOT NULL,		-- required
     ClientAddress NVARCHAR(MAX) NOT NULL,		-- required
     PasswordHash NVARCHAR(MAX) NOT NULL,          -- PasswordHash, required
