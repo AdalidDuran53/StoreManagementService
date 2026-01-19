@@ -10,7 +10,7 @@ namespace StoreManagementService.Models
         public Guid Id { get; set; }
         public Guid? ClientId { get; set; }
         public Guid? ItemId { get; set; }
-        public int ItemAmont { get; set; }
+        public int ItemAmount { get; set; }
         public DateTime OperationDate { get; set; }
         public bool? IsDeleted { get; set; }
         public bool? WasSold { get; set; }
