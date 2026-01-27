@@ -55,7 +55,7 @@ namespace StoreManagementService.Controllers.Implementation
 
         [HttpPost]
         [Route("~/{version::apiVersion}/ItemsStore/GetItem")]
-        public async override Task<IActionResult> GetItem([FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required] string version, [Required] Guid clientId, [Required] Guid sessionId, Guid? itemId = null)
+        public async override Task<IActionResult> GetItem([FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required] string version, [Required] Guid clientId, [Required] Guid sessionId, [Required] Guid storeId, Guid? itemId = null)
         {
             // Log the request
             Dictionary<string, object> request = new Dictionary<string, object> { { "GetItemsStoreRequest", new object[] { "version: " + version, "clientId: " + clientId, "sessionId: " + sessionId, "itemId: " + itemId } } };
@@ -64,7 +64,7 @@ namespace StoreManagementService.Controllers.Implementation
                 // log the operation
                 var operationId = await _serviceBaseFunctionality.LogOperation(request, new Dictionary<string, object>(), sessionId);
                 // Call the implementation
-                var result = await _itemStoreFunctionality.GetItem(clientId, sessionId, itemId);
+                var result = await _itemStoreFunctionality.GetItem(clientId, sessionId, storeId, itemId);
                 // Update the operation log
                 await _serviceBaseFunctionality.UpdateOperation((int)operationId.Data, request, new Dictionary<string, object> { { "GetItemsStoreRequest", result } }, sessionId);
                 // return the result
@@ -83,14 +83,14 @@ namespace StoreManagementService.Controllers.Implementation
 
         [HttpDelete]
         [Route("~/{version::apiVersion}/ItemsStore/DeleteItem")]
-        public async override Task<IActionResult> DeleteItem([FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required] string version, [Required] Guid clientId, [Required] Guid sessionId, Guid itemId)
+        public async override Task<IActionResult> DeleteItem([FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required] string version, [Required] Guid clientId, [Required] Guid sessionId, [Required] Guid storeId, [Required] Guid itemId)
         {
             // Log the request
             Dictionary<string, object> request = new Dictionary<string, object> { { "DeleteItemsStoreRequest", new object[] { "version: " + version, "clientId: " + clientId, "sessionId: " + sessionId } } };
             try
             {
                 // Call the implementation
-                var result = await _itemStoreFunctionality.DeleteItem(clientId, sessionId, itemId);
+                var result = await _itemStoreFunctionality.DeleteItem(clientId, sessionId, storeId, itemId);
                 // Log the response
                 Dictionary<string, object> response = new Dictionary<string, object> { { "DeleteItemsStoreResponse", result } };
                 // Log the operation
