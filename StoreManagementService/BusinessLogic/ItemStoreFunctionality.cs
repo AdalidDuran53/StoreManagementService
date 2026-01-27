@@ -58,7 +58,7 @@ namespace StoreManagementService.BusinessLogic
             }
         }
 
-        public async Task<CustomResponse> GetItem(Guid clientId, Guid sessionId, Guid? itemId)
+        public async Task<CustomResponse> GetItem(Guid clientId, Guid sessionId, Guid storeId, Guid? itemId)
         {
             try
             {
@@ -72,7 +72,7 @@ namespace StoreManagementService.BusinessLogic
                     if (itemId.HasValue)
                     {
                         // check if the item exists
-                        var item = await context.ItemsStoresRelationships.FirstOrDefaultAsync(t => t.ItemId == itemId && !t.IsDeleted.GetValueOrDefault());
+                        var item = await context.ItemsStoresRelationships.FirstOrDefaultAsync(t => t.StoreId == storeId && t.ItemId == itemId && (t.IsDeleted == false || t.IsDeleted == null));
                         // if not, throw an exception
                         if (item == null)
                         {
@@ -85,7 +85,7 @@ namespace StoreManagementService.BusinessLogic
                     else
                     {
                         // get all items
-                        existingItems = await context.ItemsStoresRelationships.ToListAsync();
+                        existingItems = await context.ItemsStoresRelationships.Where(i => i.StoreId == storeId && (i.IsDeleted == false || i.IsDeleted == null)).ToListAsync();
                     }
 
                     var itemsResult = existingItems.Adapt<List<ItemsStoresRelationship>>();
@@ -105,7 +105,7 @@ namespace StoreManagementService.BusinessLogic
             }
         }
 
-        public async Task<CustomResponse> DeleteItem(Guid clientId, Guid sessionId, Guid itemId)
+        public async Task<CustomResponse> DeleteItem(Guid clientId, Guid sessionId, Guid storeId, Guid itemId)
         {
             try
             {
@@ -114,7 +114,7 @@ namespace StoreManagementService.BusinessLogic
                 {
                     // find the Item by StoreId
                     var item = await context.ItemsStoresRelationships
-                    .FirstOrDefaultAsync(u => u.ItemId == itemId && u.IsDeleted == false);
+                    .FirstOrDefaultAsync(u => u.StoreId == storeId && u.ItemId == itemId && u.IsDeleted == false);
                     if (item == null)
                     {
                         var exception = this._errorService.GetError("OMS-ITEM-NOTFOUND-ERROR");
