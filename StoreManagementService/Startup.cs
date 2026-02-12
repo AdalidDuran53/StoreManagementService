@@ -106,7 +106,7 @@ namespace StoreManagementService
 
             app.UseRouting();
 
-            app.UseCors("AllowLocalhost");
+            app.UseCors("AllowAll");
             app.UseAuthorization();
 
             // Enable API versioning
