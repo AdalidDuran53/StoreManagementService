@@ -5,6 +5,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="OpenAPIs\EmailVerifyClient.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <OpenApiReference Include="OpenAPIs\EmailVerifyClient.json" ClassName="EmailVerifyClient" Namespace="StoreManagementService.EVS" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Mapster" Version="6.0.0" />
     <PackageReference Include="Mapster.DependencyInjection" Version="1.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.1.0" />
@@ -13,8 +21,16 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.ApiDescription.Client" Version="7.0.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.SqlServer.Server" Version="1.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageReference Include="NSwag.ApiDescription.Client" Version="13.18.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.9.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="7.3.1" />

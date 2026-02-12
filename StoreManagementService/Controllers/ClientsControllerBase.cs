@@ -19,14 +19,14 @@ namespace StoreManagementService.Controllers
         [SwaggerResponse(statusCode: 200, type: typeof(ActionResult), description: "Ok")]
         [SwaggerResponse(statusCode: 400, type: typeof(ActionResult), description: "Bab Request")]
         [SwaggerResponse(statusCode: 401, type: typeof(ActionResult), description: "Unauthorized")]
-        public abstract Task<IActionResult> AddClient([FromRoute][Required][RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$")] string version, [Required] string userName, [Required] string password, [Required] string clientName, [Required] string clientLastName, [Required] string clientAddress);
+        public abstract Task<IActionResult> AddClient([FromRoute][Required][RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$")] string version, [Required, EmailAddress] string emailAddress, [Required] string password, [Required] string clientName, [Required] string clientLastName, [Required] string clientAddress);
 
         [HttpPost]
         [Route("~/{version}/Clients/")]
         [SwaggerResponse(statusCode: 200, type: typeof(ActionResult), description: "Ok")]
         [SwaggerResponse(statusCode: 400, type: typeof(ActionResult), description: "Bab Request")]
         [SwaggerResponse(statusCode: 401, type: typeof(ActionResult), description: "Unauthorized")]
-        public abstract Task<IActionResult> Login([FromRoute][Required][RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$")] string version, [Required] string userName, [Required] string password);
+        public abstract Task<IActionResult> Login([FromRoute][Required][RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$")] string version, [Required, EmailAddress] string emailAddress, [Required] string password);
 
         [HttpPut]
         [Route("~/{version}/Clients/")]

@@ -16,24 +16,27 @@ namespace StoreManagementService.Controllers.Implementation
     {
         private readonly ClientFunctionality _clientFunctionality;
         private readonly ServiceBaseFunctionality _serviceBaseFunctionality;
+        private readonly EmailVerifyFunctionality _emailVerifyFunctionality;
         private readonly ErrorServiceModel _errorService = new ErrorServiceModel();
-        public ClientsImplementationController(ClientFunctionality clientFunctionality, ServiceBaseFunctionality serviceBaseFunctionality)
+        public ClientsImplementationController(ClientFunctionality clientFunctionality, ServiceBaseFunctionality serviceBaseFunctionality, EmailVerifyFunctionality emailVerifyFunctionality)
         {
             _clientFunctionality = clientFunctionality;
             _serviceBaseFunctionality = serviceBaseFunctionality;
             _errorService = new ErrorServiceModel();
+            _emailVerifyFunctionality = emailVerifyFunctionality;
         }
 
         [HttpPost]
         [Route("~/{version::apiVersion}/Clients/AddClient")]
-        public override async Task<IActionResult> AddClient([FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required] string version, [Required] string userName, [Required] string password, [Required] string clientName, [Required] string clientLastName, [Required] string clientAddress)
+        public override async Task<IActionResult> AddClient([FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required] string version, [Required, EmailAddress] string emailAddress, [Required] string password, [Required] string clientName, [Required] string clientLastName, [Required] string clientAddress)
         {
             // Log the request
-            Dictionary<string, object> request = new Dictionary<string, object> { { "CreateNewUserRequest", new object[] { "version: " + version, "userName: " + userName } } };
+            Dictionary<string, object> request = new Dictionary<string, object> { { "CreateNewUserRequest", new object[] { "version: " + version, "emailAddress: " + emailAddress } } };
             try
             {
                 // Call the implementation
-                var result = await _clientFunctionality.AddClient(userName, clientName, clientLastName, clientAddress, password);
+                var result = await _clientFunctionality.AddClient(emailAddress, clientName, clientLastName, clientAddress, password);
+                await _emailVerifyFunctionality.RequestVerifyCode(emailAddress, result.ClientId);
                 // Log the response
                 Dictionary<string, object> response = new Dictionary<string, object> { { "CreateNewUserResponse", result } };
                 // Log the operation
@@ -54,14 +57,14 @@ namespace StoreManagementService.Controllers.Implementation
 
         [HttpPost]
         [Route("~/{version::apiVersion}/Clients/Login")]
-        public async override Task<IActionResult> Login([FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required] string version, [Required] string userName, [Required] string password)
+        public async override Task<IActionResult> Login([FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required] string version, [Required, EmailAddress] string emailAddress, [Required] string password)
         {
             // Log the request
-            Dictionary<string, object> request = new Dictionary<string, object> { { "LoginRequest", new object[] { "version: " + version, "userName: " + userName } } };
+            Dictionary<string, object> request = new Dictionary<string, object> { { "LoginRequest", new object[] { "version: " + version, "emailAddress: " + emailAddress } } };
             try
             {
                 // Call the implementation
-                var result = await _clientFunctionality.LoginUser(userName, password);
+                var result = await _clientFunctionality.LoginUser(emailAddress, password);
                 // Log the response
                 var sessionLogResponse = await _serviceBaseFunctionality.InitSession(result.ClientId);
                 Dictionary<string, object> response = new Dictionary<string, object> { { "LoginResponse", result }, { "SessionLogResponse", sessionLogResponse } };

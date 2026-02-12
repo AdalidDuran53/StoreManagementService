@@ -3,42 +3,53 @@ using ExceptionsManagement;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using StoreManagementService.Models;
 using System;
+using System.Net.Http;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using StoreManagementService.Models;
+using Client = DTOs.Client;
 
 namespace StoreManagementService.BusinessLogic
 {
-    public class ClientFunctionality : FunctionalityBaseController
+    public class EmailVerifyFunctionality : FunctionalityBaseController
     {
-        public async Task<CustomResponse> AddClient(string emailAddress, string clientName, string clientLastName, string clientAddress, string password)
+
+        public HttpClient GetHtpClient()
+        {
+            //Declaramos un cliente
+            HttpClient httpClient = new HttpClient();
+            string AuthenticationKey = Environment.GetEnvironmentVariable("AuthenticationKey");
+            httpClient.DefaultRequestHeaders.Add("AuthenticationKey", AuthenticationKey);
+            httpClient.Timeout = TimeSpan.FromMinutes(5);
+            return httpClient;
+        }
+        public async Task<CustomResponse> RequestVerifyCode(string emailAddress, Guid clientId)
         {
             try
             {
+                HttpClient client = GetHtpClient();
 
-                var pass = HashPassword(password);
-                // build the user object
-                DTOs.Client newClient = new DTOs.Client(clientId: Guid.NewGuid(), emailAddress: emailAddress, clientName: clientName, clientLastName: clientLastName, clientAddress: clientAddress, password: pass.Hash, salst: pass.Salt);
-                // validate the user object
-                this.ValidateModel(newClient);
-                // save the user object
+                string EVSBaseUrl = Environment.GetEnvironmentVariable("EVSBaseUrl");
+                string EVSVersion = Environment.GetEnvironmentVariable("EVSVersion");
+                Guid appToken = new Guid(Environment.GetEnvironmentVariable("appToken"));
+                Guid AuthenticationKey = new Guid(Environment.GetEnvironmentVariable("AuthenticationKey"));
+                
+                EVS.EmailVerifyClient emailVerifyClient = new EVS.EmailVerifyClient(EVSBaseUrl, client);
+                
+                var result = await emailVerifyClient.RequestVerifyCodeAsync(EVSVersion, emailAddress, appToken, AuthenticationKey);
+
                 using (var context = new StoreManagementService.Models.StoreManagementContext())
                 {
-                    // check for duplicate user names
-                    var isInvalidUserName = await context.Clients.AnyAsync(s => s.EmailAddress.Equals(newClient.EmailAddress));
-                    if (isInvalidUserName)
-                    {
-                        // if the user name already exists, throw an error
-                        var exception = this._errorService.GetError("OMS-USERNAME-ERROR");
-                        throw new OperationException(errorCode: exception.Code, message: exception.Message, details: exception.Details, new Guid());
-                    }
-                    // map the user object to the entity model
-                    var client = Mapster.TypeAdapter.Adapt<Models.Client>(newClient);
-                    context.Clients.Add(client);
-                    await context.SaveChangesAsync();
+                    VerifyCode verifyCode = new VerifyCode();
+                    verifyCode.Token = result.Token;
+                    verifyCode.VerifyStatus = (int)VerifyStatusCodes.pending;
+                    verifyCode.ClientId = clientId;
+                    verifyCode.CreationDate = DateTime.Now;
+                    context.VerifyCodes.Add(verifyCode);
                 }
-                // return the result
-                return new CustomResponse(statusCode: StatusCodes.Status200OK, message: "added user successfully.", clientId: newClient.ClientId); ;
+
+                return new CustomResponse(statusCode: StatusCodes.Status200OK, message: "send Verification Code successfully", clientId: clientId);
             }
             catch (Exception ex)
             {
@@ -58,7 +69,7 @@ namespace StoreManagementService.BusinessLogic
                 // hash the password
                 var pass = HashPassword(password);
                 // build the user object
-                DTOs.Client dataClient = new DTOs.Client(clientId: Guid.NewGuid(), emailAddress: emailAddress, clientName: string.Empty, clientLastName: string.Empty, clientAddress: string.Empty, password: pass.Hash, salst: pass.Salt);
+                Client dataClient = new Client(clientId: Guid.NewGuid(), emailAddress: emailAddress, clientName: string.Empty, clientLastName: string.Empty, clientAddress: string.Empty, password: pass.Hash, salst: pass.Salt);
                 dataClient.isLogin = true;
                 // validate the user object
                 this.ValidateModel(dataClient);
@@ -76,7 +87,7 @@ namespace StoreManagementService.BusinessLogic
                     }
 
                     // return the result
-                    return new CustomResponse(statusCode: StatusCodes.Status200OK, message: "Login successfully.", clientId: client.ClientId);
+                    return new CustomResponse(statusCode: StatusCodes.Status200OK, message: "validated verify code successfully.", clientId: client.ClientId);
                 }
             }
             catch (Exception ex)
@@ -119,7 +130,7 @@ namespace StoreManagementService.BusinessLogic
             }
         }
 
-        public async Task<CustomResponse> UpdateUser(Guid clientId, Guid sessionId, string currentPassword, string newPassword, string emailAddress, string newClientName, string newClientLastName, string newClientAddress)
+        public async Task<CustomResponse> UpdateUser(Guid clientId, Guid sessionId, string currentPassword, string newPassword, string userName, string newClientName, string newClientLastName, string newClientAddress)
         {
             try
             {
@@ -146,17 +157,17 @@ namespace StoreManagementService.BusinessLogic
                             user.PasswordSalst = pass.Salt;
                         }
                         // if user name is provided, update the user name
-                        if (!String.IsNullOrEmpty(emailAddress))
+                        if (!String.IsNullOrEmpty(userName))
                         {
                             // check for duplicate user names
-                            var isInvalidUserName = await context.Clients.AnyAsync(s => s.EmailAddress.Equals(emailAddress) && s.ClientId != clientId);
+                            var isInvalidUserName = await context.Clients.AnyAsync(s => s.EmailAddress.Equals(userName) && s.ClientId != clientId);
                             if (isInvalidUserName)
                             {
                                 // if the user name already exists, throw an error
                                 var exception = this._errorService.GetError("OMS-USERNAME-ERROR");
                                 throw new OperationException(errorCode: exception.Code, message: exception.Message, details: exception.Details, new Guid());
                             }
-                            user.EmailAddress = emailAddress;
+                            user.EmailAddress = userName;
                         }
                         if (!String.IsNullOrEmpty(newClientName))
                             user.ClientName = newClientName;
@@ -165,7 +176,7 @@ namespace StoreManagementService.BusinessLogic
                         if (!String.IsNullOrEmpty(newClientAddress))
                             user.ClientAddress = newClientAddress;
                         // map the user object to custom user model for validation
-                        var updatedUser = Mapster.TypeAdapter.Adapt<DTOs.Client>(user);
+                        var updatedUser = Mapster.TypeAdapter.Adapt<Client>(user);
                         this.ValidateModel(updatedUser);
                         // update the user
                         context.Clients.Update(user);

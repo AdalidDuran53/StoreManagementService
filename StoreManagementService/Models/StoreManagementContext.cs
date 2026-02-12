@@ -23,7 +23,9 @@ namespace StoreManagementService.Models
         public virtual DbSet<ItemsStoresRelationship> ItemsStoresRelationships { get; set; }
         public virtual DbSet<OperationLog> OperationLogs { get; set; }
         public virtual DbSet<SessionLog> SessionLogs { get; set; }
+        public virtual DbSet<StatusCode> StatusCodes { get; set; }
         public virtual DbSet<Store> Stores { get; set; }
+        public virtual DbSet<VerifyCode> VerifyCodes { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -42,10 +44,7 @@ namespace StoreManagementService.Models
 
             modelBuilder.Entity<Client>(entity =>
             {
-                entity.HasIndex(e => e.ClientName, "UQ__Clients__65800DA0F86D69E3")
-                    .IsUnique();
-
-                entity.HasIndex(e => e.UserName, "UQ__Clients__C9F2845646673A8C")
+                entity.HasIndex(e => e.EmailAddress, "UQ__Clients__347C3027DF1F2C2C")
                     .IsUnique();
 
                 entity.Property(e => e.ClientId)
@@ -58,7 +57,13 @@ namespace StoreManagementService.Models
                     .IsRequired()
                     .HasMaxLength(100);
 
-                entity.Property(e => e.ClientName).HasMaxLength(50);
+                entity.Property(e => e.ClientName)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.EmailAddress)
+                    .HasMaxLength(50)
+                    .HasColumnName("emailAddress");
 
                 entity.Property(e => e.IsDeleted)
                     .HasColumnName("isDeleted")
@@ -67,8 +72,6 @@ namespace StoreManagementService.Models
                 entity.Property(e => e.PasswordHash).IsRequired();
 
                 entity.Property(e => e.PasswordSalst).IsRequired();
-
-                entity.Property(e => e.UserName).HasMaxLength(50);
             });
 
             modelBuilder.Entity<Item>(entity =>
@@ -119,12 +122,12 @@ namespace StoreManagementService.Models
                 entity.HasOne(d => d.Client)
                     .WithMany(p => p.ItemsClientsRelationships)
                     .HasForeignKey(d => d.ClientId)
-                    .HasConstraintName("FK__ItemsClie__Clien__33D4B598");
+                    .HasConstraintName("FK__ItemsClie__Clien__32E0915F");
 
                 entity.HasOne(d => d.Item)
                     .WithMany(p => p.ItemsClientsRelationships)
                     .HasForeignKey(d => d.ItemId)
-                    .HasConstraintName("FK__ItemsClie__ItemI__34C8D9D1");
+                    .HasConstraintName("FK__ItemsClie__ItemI__33D4B598");
             });
 
             modelBuilder.Entity<ItemsStoresRelationship>(entity =>
@@ -148,18 +151,18 @@ namespace StoreManagementService.Models
                 entity.HasOne(d => d.Item)
                     .WithMany(p => p.ItemsStoresRelationships)
                     .HasForeignKey(d => d.ItemId)
-                    .HasConstraintName("FK__ItemsStor__ItemI__2F10007B");
+                    .HasConstraintName("FK__ItemsStor__ItemI__2E1BDC42");
 
                 entity.HasOne(d => d.Store)
                     .WithMany(p => p.ItemsStoresRelationships)
                     .HasForeignKey(d => d.StoreId)
-                    .HasConstraintName("FK__ItemsStor__Store__300424B4");
+                    .HasConstraintName("FK__ItemsStor__Store__2F10007B");
             });
 
             modelBuilder.Entity<OperationLog>(entity =>
             {
                 entity.HasKey(e => e.OperationId)
-                    .HasName("PK__Operatio__A4F5FC64A68F81FA");
+                    .HasName("PK__Operatio__A4F5FC64AE66DE3E");
 
                 entity.ToTable("OperationLog");
 
@@ -172,13 +175,13 @@ namespace StoreManagementService.Models
                 entity.HasOne(d => d.Session)
                     .WithMany(p => p.OperationLogs)
                     .HasForeignKey(d => d.SessionId)
-                    .HasConstraintName("FK__Operation__Respo__3C69FB99");
+                    .HasConstraintName("FK__Operation__Respo__3B75D760");
             });
 
             modelBuilder.Entity<SessionLog>(entity =>
             {
                 entity.HasKey(e => e.SessionId)
-                    .HasName("PK__SessionL__C9F49270FC94A6E6");
+                    .HasName("PK__SessionL__C9F49270A486AE83");
 
                 entity.ToTable("SessionLog");
 
@@ -195,7 +198,16 @@ namespace StoreManagementService.Models
                 entity.HasOne(d => d.Client)
                     .WithMany(p => p.SessionLogs)
                     .HasForeignKey(d => d.ClientId)
-                    .HasConstraintName("FK__SessionLo__EndSe__398D8EEE");
+                    .HasConstraintName("FK__SessionLo__EndSe__38996AB5");
+            });
+
+            modelBuilder.Entity<StatusCode>(entity =>
+            {
+                entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.StatusDescription)
+                    .IsRequired()
+                    .HasMaxLength(100);
             });
 
             modelBuilder.Entity<Store>(entity =>
@@ -215,6 +227,26 @@ namespace StoreManagementService.Models
                 entity.Property(e => e.StoreBranch)
                     .IsRequired()
                     .HasMaxLength(50);
+            });
+
+            modelBuilder.Entity<VerifyCode>(entity =>
+            {
+                entity.Property(e => e.Id)
+                    .ValueGeneratedNever()
+                    .HasColumnName("ID");
+
+                entity.Property(e => e.ClientId).HasColumnName("ClientID");
+
+                entity.Property(e => e.Code).HasMaxLength(15);
+
+                entity.Property(e => e.CreationDate).HasColumnType("datetime");
+
+                entity.Property(e => e.VerifyDate).HasColumnType("datetime");
+
+                entity.HasOne(d => d.Client)
+                    .WithMany(p => p.VerifyCodes)
+                    .HasForeignKey(d => d.ClientId)
+                    .HasConstraintName("FK__VerifyCod__Verif__403A8C7D");
             });
 
             OnModelCreatingPartial(modelBuilder);

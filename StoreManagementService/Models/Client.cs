@@ -11,10 +11,11 @@ namespace StoreManagementService.Models
         {
             ItemsClientsRelationships = new HashSet<ItemsClientsRelationship>();
             SessionLogs = new HashSet<SessionLog>();
+            VerifyCodes = new HashSet<VerifyCode>();
         }
 
         public Guid ClientId { get; set; }
-        public string UserName { get; set; }
+        public string EmailAddress { get; set; }
         public string ClientName { get; set; }
         public string ClientLastName { get; set; }
         public string ClientAddress { get; set; }
@@ -24,5 +25,6 @@ namespace StoreManagementService.Models
 
         public virtual ICollection<ItemsClientsRelationship> ItemsClientsRelationships { get; set; }
         public virtual ICollection<SessionLog> SessionLogs { get; set; }
+        public virtual ICollection<VerifyCode> VerifyCodes { get; set; }
     }
 }
