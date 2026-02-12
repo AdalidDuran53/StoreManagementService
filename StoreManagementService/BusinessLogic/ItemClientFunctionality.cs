@@ -15,7 +15,7 @@ namespace StoreManagementService.BusinessLogic
 {
     public class ItemClientFunctionality : FunctionalityBaseController
     {
-        public async Task<ActionResult> addItem(Guid clientId, Guid sessionId, Guid itemID, int itemAmount, DateTime operationDate)
+        public async Task<CustomResponse> addItem(Guid clientId, Guid sessionId, Guid itemID, int itemAmount, DateTime operationDate)
         {
             try
             {
@@ -50,8 +50,7 @@ namespace StoreManagementService.BusinessLogic
                     await context.SaveChangesAsync();
                 }
                 // return the result
-                var result = Ok(new { success = true, message = "Data saved successfully." });
-                return result;
+                return new CustomResponse(statusCode: StatusCodes.Status201Created, message: "added item successfully.", clientId: clientId, sessionId: sessionId);
             }
             catch (Exception ex)
             {

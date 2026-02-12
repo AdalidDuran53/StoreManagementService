@@ -8,11 +8,14 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi.Models;
 using StoreManagementService.BusinessLogic;
+using Swashbuckle.AspNetCore.Filters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static StoreManagementService.FilterProvider.ExamplesProvider;
 
 namespace StoreManagementService
 {
@@ -32,6 +35,25 @@ namespace StoreManagementService
             // register swagger generator
             services.AddSwaggerGen();
 
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "StoreManagementService",
+                    Version = "v1",
+                    Description = "API para gestion de inventarios"
+                });
+            });
+
+            services.AddSwaggerGen(c =>
+            {
+                c.ExampleFilters();
+            });
+
+            services.AddSwaggerExamplesFromAssemblyOf<CustomResponseCreatedExample>();
+            services.AddSwaggerExamplesFromAssemblyOf<CustomResponseBadRequestExample>();
+            services.AddSwaggerExamplesFromAssemblyOf<CustomResponseOKExample>();
+
             // Configure API versioning
             services.AddApiVersioning(options =>
             {
@@ -41,7 +63,7 @@ namespace StoreManagementService
             });
             services.AddCors(options =>
             {
-                options.AddPolicy("AllowLocalhost",
+                options.AddPolicy("AllowAll",
                     builder => builder.WithOrigins("*")
                                       .AllowAnyHeader()
                                       .AllowAnyMethod());

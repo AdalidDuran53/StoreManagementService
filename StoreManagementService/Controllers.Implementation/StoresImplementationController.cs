@@ -1,17 +1,22 @@
 ﻿using DTOs;
 using ExceptionsManagement;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using StoreManagementService.BusinessLogic;
+using Swashbuckle.AspNetCore.Annotations;
+using Swashbuckle.AspNetCore.Filters;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
+using static StoreManagementService.FilterProvider.ExamplesProvider;
 
 namespace StoreManagementService.Controllers.Implementation
 {
     [ApiVersion("0.1")]
     [ApiController]
+    [EnableCors("AllowAll")]
     public class StoresImplementationController : StoresControllerBase
     {
         private readonly StoreFunctionality _storeFunctionality;
@@ -26,6 +31,10 @@ namespace StoreManagementService.Controllers.Implementation
 
         [HttpPost]
         [Route("~/{version::apiVersion}/Stores/AddStore")]
+        [SwaggerResponseExample(StatusCodes.Status201Created, typeof(CustomResponseCreatedExample))]
+        [SwaggerResponse(statusCode: StatusCodes.Status201Created, type: typeof(CustomResponse), description: "Ok")]
+        [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(CustomResponseBadRequestExample))]
+        [SwaggerResponse(statusCode: StatusCodes.Status400BadRequest, type: typeof(ErrorResponse), description: "Bab Request")]
         public async override Task<IActionResult> AddStore([FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required] string version, [Required] Guid clientId, [Required] Guid sessionId, [Required] string storeBranch, [Required] string storeAddress)
         {
             // Log the request
@@ -39,7 +48,7 @@ namespace StoreManagementService.Controllers.Implementation
                 // Log the operation
                 await _serviceBaseFunctionality.LogOperation(request, response);
                 // return the result
-                return Ok(result);
+                return this.Created(String.Empty, result);
             }
             catch (Exception ex)
             {
@@ -54,6 +63,10 @@ namespace StoreManagementService.Controllers.Implementation
 
         [HttpGet]
         [Route("~/{version::apiVersion}/Stores/GetStore")]
+        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(CustomResponseOKExample))]
+        [SwaggerResponse(statusCode: StatusCodes.Status200OK, type: typeof(CustomResponse), description: "Ok")]
+        [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(CustomResponseBadRequestExample))]
+        [SwaggerResponse(statusCode: StatusCodes.Status400BadRequest, type: typeof(ErrorResponse), description: "Bab Request")]
         public async override Task<IActionResult> GetStore([FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required] string version, [Required] Guid clientId, [Required] Guid sessionId, Guid? storeId = null)
         {
             // Log the request
@@ -82,6 +95,10 @@ namespace StoreManagementService.Controllers.Implementation
 
         [HttpPut]
         [Route("~/{version::apiVersion}/Stores/UpdateStore")]
+        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(CustomResponseOKExample))]
+        [SwaggerResponse(statusCode: StatusCodes.Status200OK, type: typeof(CustomResponse), description: "Ok")]
+        [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(CustomResponseBadRequestExample))]
+        [SwaggerResponse(statusCode: StatusCodes.Status400BadRequest, type: typeof(ErrorResponse), description: "Bab Request")]
         public async override Task<IActionResult> UpdateStore([FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required] string version, [Required] Guid clientId, [Required] Guid sessionId, [Required] Guid storeId, string newStoreBranch = null, string newStoreAddress = null)
         {
             // Log the request
@@ -110,6 +127,10 @@ namespace StoreManagementService.Controllers.Implementation
 
         [HttpDelete]
         [Route("~/{version::apiVersion}/Stores/DeleteStore")]
+        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(CustomResponseOKExample))]
+        [SwaggerResponse(statusCode: StatusCodes.Status200OK, type: typeof(CustomResponse), description: "Ok")]
+        [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(CustomResponseBadRequestExample))]
+        [SwaggerResponse(statusCode: StatusCodes.Status400BadRequest, type: typeof(ErrorResponse), description: "Bab Request")]
         public async override Task<IActionResult> DeleteStore([FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required] string version, [Required] Guid clientId, [Required] Guid sessionId, Guid storeId)
         {
             // Log the request

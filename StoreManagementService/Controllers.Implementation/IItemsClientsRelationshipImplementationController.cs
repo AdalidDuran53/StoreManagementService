@@ -1,18 +1,23 @@
 ﻿using DTOs;
 using ExceptionsManagement;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using StoreManagementService.BusinessLogic;
 using StoreManagementService.Models;
+using Swashbuckle.AspNetCore.Annotations;
+using Swashbuckle.AspNetCore.Filters;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
+using static StoreManagementService.FilterProvider.ExamplesProvider;
 
 namespace StoreManagementService.Controllers.Implementation
 {
     [ApiVersion("0.1")]
     [ApiController]
+    [EnableCors("AllowAll")]
     public class ItemsClientsRelationshipImplementationController : ItemsClientsRelationshipControllerBase
     {
         private readonly ItemClientFunctionality _itemClientFunctionality;
@@ -27,6 +32,10 @@ namespace StoreManagementService.Controllers.Implementation
 
         [HttpPost]
         [Route("~/{version::apiVersion}/ItemsClient/AddItem")]
+        [SwaggerResponseExample(StatusCodes.Status201Created, typeof(CustomResponseCreatedExample))]
+        [SwaggerResponse(statusCode: StatusCodes.Status201Created, type: typeof(CustomResponse), description: "Ok")]
+        [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(CustomResponseBadRequestExample))]
+        [SwaggerResponse(statusCode: StatusCodes.Status400BadRequest, type: typeof(ErrorResponse), description: "Bab Request")]
         public async override Task<IActionResult> AddItem([FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required] string version, [Required] Guid clientId, [Required] Guid sessionId, [Required] Guid itemID, [Required] int itemAmount, [Required] DateTime operationDate)
         {
             // Log the request
@@ -40,7 +49,7 @@ namespace StoreManagementService.Controllers.Implementation
                 // Log the operation
                 await _serviceBaseFunctionality.LogOperation(request, response);
                 // return the result
-                return Ok(result);
+                return this.Created(String.Empty, result);
             }
             catch (Exception ex)
             {
@@ -55,6 +64,10 @@ namespace StoreManagementService.Controllers.Implementation
 
         [HttpPost]
         [Route("~/{version::apiVersion}/ItemsClient/GetItem")]
+        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(CustomResponseOKExample))]
+        [SwaggerResponse(statusCode: StatusCodes.Status200OK, type: typeof(CustomResponse), description: "Ok")]
+        [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(CustomResponseBadRequestExample))]
+        [SwaggerResponse(statusCode: StatusCodes.Status400BadRequest, type: typeof(ErrorResponse), description: "Bab Request")]
         public async override Task<IActionResult> GetItem([FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required] string version, [Required] Guid clientId, [Required] Guid sessionId, Guid? itemId = null)
         {
             // Log the request
@@ -83,6 +96,10 @@ namespace StoreManagementService.Controllers.Implementation
 
         [HttpPut]
         [Route("~/{version::apiVersion}/ItemsClient/SellItem")]
+        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(CustomResponseOKExample))]
+        [SwaggerResponse(statusCode: StatusCodes.Status200OK, type: typeof(CustomResponse), description: "Ok")]
+        [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(CustomResponseBadRequestExample))]
+        [SwaggerResponse(statusCode: StatusCodes.Status400BadRequest, type: typeof(ErrorResponse), description: "Bab Request")]
         public async override Task<IActionResult> SellItem([FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required] string version, [Required] Guid clientId, [Required] Guid sessionId)
         {
             // Log the request
@@ -111,6 +128,10 @@ namespace StoreManagementService.Controllers.Implementation
 
         [HttpDelete]
         [Route("~/{version::apiVersion}/ItemsClient/DeleteItem")]
+        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(CustomResponseOKExample))]
+        [SwaggerResponse(statusCode: StatusCodes.Status200OK, type: typeof(CustomResponse), description: "Ok")]
+        [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(CustomResponseBadRequestExample))]
+        [SwaggerResponse(statusCode: StatusCodes.Status400BadRequest, type: typeof(ErrorResponse), description: "Bab Request")]
         public async override Task<IActionResult> DeleteItem([FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required] string version, [Required] Guid clientId, [Required] Guid sessionId, Guid itemId)
         {
             // Log the request
