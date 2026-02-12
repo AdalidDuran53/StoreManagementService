@@ -39,6 +39,15 @@ namespace StoreManagementService
                 options.AssumeDefaultVersionWhenUnspecified = true;
                 options.ApiVersionSelector = new CurrentImplementationApiVersionSelector(options);
             });
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowLocalhost",
+                    builder => builder.WithOrigins("*")
+                                      .AllowAnyHeader()
+                                      .AllowAnyMethod());
+            });
+
+
 
             services.AddScoped<ServiceBaseFunctionality>();
             services.AddScoped<ClientFunctionality>();
@@ -47,6 +56,7 @@ namespace StoreManagementService
             services.AddScoped<ItemFunctionality>();
             services.AddScoped<ItemClientFunctionality>();
             services.AddScoped<ItemStoreFunctionality>();
+            services.AddScoped<EmailVerifyFunctionality>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -74,6 +84,7 @@ namespace StoreManagementService
 
             app.UseRouting();
 
+            app.UseCors("AllowLocalhost");
             app.UseAuthorization();
 
             // Enable API versioning

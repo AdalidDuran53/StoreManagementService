@@ -11,10 +11,10 @@ namespace DTOs
         {
         }
 
-        public Client(Guid clientId, string userName, string clientName, string clientLastName, string clientAddress, string password, string salst)
+        public Client(Guid clientId, string emailAddress, string clientName, string clientLastName, string clientAddress, string password, string salst)
         {
             this.ClientId = clientId;
-            this.UserName = userName;
+            this.EmailAddress = emailAddress;
             this.ClientName = clientName;
             this.ClientLastName = clientLastName;
             this.ClientAddress = clientAddress;
@@ -23,7 +23,7 @@ namespace DTOs
         }
 
         public Guid ClientId { get; set; }
-        public string UserName { get; set; }
+        public string EmailAddress { get; set; }
         public string ClientName { get; set; }
         public string ClientLastName { get; set; }
         public string ClientAddress { get; set; }
@@ -36,9 +36,9 @@ namespace DTOs
         // Validate the user object
         public string Validate(string operationExceptionCode)
         {
-            if (String.IsNullOrEmpty(this.UserName))
+            if (String.IsNullOrEmpty(this.EmailAddress))
                 operationExceptionCode = "OMS-USERNAME-ERROR";
-            else if (this.UserName.Length > 50)
+            else if (this.EmailAddress.Length > 50)
                 operationExceptionCode = "OMS-USERNAME-ERROR";
             else if (String.IsNullOrEmpty(this.PasswordHash))
                 operationExceptionCode = "OMS-PASSWORD-ERROR";

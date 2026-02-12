@@ -1,0 +1,321 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "EmailVerifyService",
+    "description": "API para verificación de correos",
+    "version": "v1"
+  },
+  "paths": {
+    "/{version}/EmailVerify/RequestVerifyCode": {
+      "post": {
+        "tags": [
+          "EmailVerifyApi"
+        ],
+        "operationId": "RequestVerifyCode",
+        "parameters": [
+          {
+            "name": "version",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^(?<major>[0-9]+).(?<major>[0-9]+)$",
+              "type": "string",
+              "default": "0.1"
+            }
+          },
+          {
+            "name": "emailAddress",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "email"
+            }
+          },
+          {
+            "name": "appToken",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "AuthenticationKey",
+            "in": "header",
+            "description": "API Key for authentication",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "example": "e3f9c7a2-4b6d-4a1e-9f3d-8c2b1a7d6f91"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Ok",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomResponse"
+                },
+                "example": {
+                  "statusCode": 200,
+                  "message": "validated verify code successfully.",
+                  "token": "00000000-0000-0000-0000-000000000000",
+                  "data": null
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomResponse"
+                },
+                "example": {
+                  "statusCode": 200,
+                  "message": "validated verify code successfully.",
+                  "token": "00000000-0000-0000-0000-000000000000",
+                  "data": null
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomResponse"
+                },
+                "example": {
+                  "statusCode": 200,
+                  "message": "validated verify code successfully.",
+                  "token": "00000000-0000-0000-0000-000000000000",
+                  "data": null
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bab Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "statusCode": 400,
+                  "code": "EVS-CODE-ERROR",
+                  "message": "verify code invalid.",
+                  "details": "verify code invalid."
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "statusCode": 400,
+                  "code": "EVS-CODE-ERROR",
+                  "message": "verify code invalid.",
+                  "details": "verify code invalid."
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "statusCode": 400,
+                  "code": "EVS-CODE-ERROR",
+                  "message": "verify code invalid.",
+                  "details": "verify code invalid."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{version}/EmailVerify/ValidateVerifyCode": {
+      "post": {
+        "tags": [
+          "EmailVerifyApi"
+        ],
+        "operationId": "ValidateVerifyCode",
+        "parameters": [
+          {
+            "name": "version",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^(?<major>[0-9]+).(?<major>[0-9]+)$",
+              "type": "string",
+              "default": "0.1"
+            }
+          },
+          {
+            "name": "emailAddress",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "email"
+            }
+          },
+          {
+            "name": "token",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "verifyCode",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "AuthenticationKey",
+            "in": "header",
+            "description": "API Key for authentication",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "example": "e3f9c7a2-4b6d-4a1e-9f3d-8c2b1a7d6f91"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomResponse"
+                },
+                "example": {
+                  "statusCode": 200,
+                  "message": "validated verify code successfully.",
+                  "token": "00000000-0000-0000-0000-000000000000",
+                  "data": null
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomResponse"
+                },
+                "example": {
+                  "statusCode": 200,
+                  "message": "validated verify code successfully.",
+                  "token": "00000000-0000-0000-0000-000000000000",
+                  "data": null
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomResponse"
+                },
+                "example": {
+                  "statusCode": 200,
+                  "message": "validated verify code successfully.",
+                  "token": "00000000-0000-0000-0000-000000000000",
+                  "data": null
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bab Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "statusCode": 400,
+                  "code": "EVS-CODE-ERROR",
+                  "message": "verify code invalid.",
+                  "details": "verify code invalid."
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "statusCode": 400,
+                  "code": "EVS-CODE-ERROR",
+                  "message": "verify code invalid.",
+                  "details": "verify code invalid."
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "statusCode": 400,
+                  "code": "EVS-CODE-ERROR",
+                  "message": "verify code invalid.",
+                  "details": "verify code invalid."
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CustomResponse": {
+        "type": "object",
+        "properties": {
+          "statusCode": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "token": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "data": {
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "statusCode": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "code": {
+            "type": "string",
+            "nullable": true
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "details": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "EmailVerifyApi"
+    }
+  ]
+}

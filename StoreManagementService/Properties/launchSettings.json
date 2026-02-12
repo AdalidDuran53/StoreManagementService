@@ -13,6 +13,10 @@
       "commandName": "IISExpress",
       "launchBrowser": true,
       "environmentVariables": {
+        "EVSBaseUrl": "https://email_verify_service:123",
+        "EVSVersion": "0.1",
+        "AuthenticationKey": "e3f9c7a2-4b6d-4a1e-9f3d",
+        "appToken": "3769db9f-4f79-445b",
         "ASPNETCORE_ENVIRONMENT": "Development",
         "ConnectionStrings": "Data Source=server;Database=StoreManagement;User ID=user;Password=password;TrustServerCertificate=True;" // replace with actual connection string
       }

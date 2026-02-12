@@ -10,7 +10,7 @@ USE StoreManagement;
 --****************************** TABLE FOR LOGIN ******************************
 CREATE TABLE StoreManagement.dbo.Clients (
     ClientID UNIQUEIDENTIFIER PRIMARY KEY, -- UserID, must be UNIQUEIDENTIFIER
-    UserName NVARCHAR(50) UNIQUE,         -- User name, must be UNIQUE
+    emailAddress NVARCHAR(50) UNIQUE,         -- User name, must be UNIQUE
     ClientName NVARCHAR(50)  NOT NULL,         -- User name, must be UNIQUE
 	ClientLastName NVARCHAR(100) NOT NULL,		-- required
     ClientAddress NVARCHAR(MAX) NOT NULL,		-- required
@@ -77,4 +77,27 @@ CREATE TABLE StoreManagement.dbo.OperationLog (
     Request NVARCHAR(MAX),          
     Response NVARCHAR(MAX)
     FOREIGN KEY (SessionID) REFERENCES SessionLog(SessionID)
+);
+
+-- Create a table named StatusCodes within the EmailVerifyServiceDB database to store status descriptions
+CREATE TABLE StoreManagement.dbo.StatusCodes (  
+    -- Unique identifier for each status, auto-incremented starting from 1 with an increment of 1
+    ID INT IDENTITY(1,1) PRIMARY KEY,  
+    -- Description of the status in NVARCHAR format
+    StatusDescription NVARCHAR(100) NOT NULL 
+);  
+  
+-- Insert predefined statuses into the StatusCodes table. These are static values that represent different states or outcomes.
+INSERT INTO StoreManagement.dbo.StatusCodes (StatusDescription)  
+VALUES ('Pending'), ('Verified'), ('Expired');  
+
+CREATE TABLE StoreManagement.dbo.VerifyCodes (
+    ID UNIQUEIDENTIFIER PRIMARY KEY, 
+    ClientID UNIQUEIDENTIFIER,
+    Token UNIQUEIDENTIFIER,         -- Foreign key
+    VerifyStatus INT,
+    Code NVARCHAR (15),
+    CreationDate DATETIME NOT NULL,          
+    VerifyDate DATETIME
+    FOREIGN KEY (ClientID) REFERENCES Clients(ClientID)
 );
