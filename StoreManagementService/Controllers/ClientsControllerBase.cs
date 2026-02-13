@@ -7,6 +7,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using Swashbuckle.AspNetCore.Filters;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
@@ -28,7 +29,7 @@ namespace StoreManagementService.Controllers
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(CustomResponseBadRequestExample))]
         [SwaggerResponse(statusCode: StatusCodes.Status400BadRequest, type: typeof(ErrorResponse), description: "Bab Request")]
         [SwaggerResponse(statusCode: StatusCodes.Status401Unauthorized, type: typeof(ActionResult), description: "Unauthorized")]
-        public abstract Task<IActionResult> AddClient([FromRoute][Required][RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$")] string version, [Required, EmailAddress] string emailAddress, [Required] string password, [Required] string clientName, [Required] string clientLastName, [Required] string clientAddress);
+        public abstract Task<IActionResult> AddClient([FromRoute][Required][RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$")][DefaultValue("0.1")] string version, [Required, EmailAddress] string emailAddress, [Required] string password, [Required] string clientName, [Required] string clientLastName, [Required] string clientAddress);
 
         [HttpPost]
         [Route("~/{version}/Clients/")]
@@ -38,7 +39,10 @@ namespace StoreManagementService.Controllers
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(CustomResponseBadRequestExample))]
         [SwaggerResponse(statusCode: StatusCodes.Status400BadRequest, type: typeof(ErrorResponse), description: "Bab Request")]
         [SwaggerResponse(statusCode: StatusCodes.Status401Unauthorized, type: typeof(ActionResult), description: "Unauthorized")]
-        public abstract Task<IActionResult> Login([FromRoute][Required][RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$")] string version, [Required, EmailAddress] string emailAddress, [Required] string password);
+        public abstract Task<IActionResult> Login([FromRoute][Required][RegularExpression(
+            "^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$")][DefaultValue("0.1")] string version, 
+            [Required, EmailAddress] string emailAddress, 
+            [Required] string password);
 
         [HttpPut]
         [Route("~/{version}/Clients/")]
@@ -48,7 +52,16 @@ namespace StoreManagementService.Controllers
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(CustomResponseBadRequestExample))]
         [SwaggerResponse(statusCode: StatusCodes.Status400BadRequest, type: typeof(ErrorResponse), description: "Bab Request")]
         [SwaggerResponse(statusCode: StatusCodes.Status401Unauthorized, type: typeof(ActionResult), description: "Unauthorized")]
-        public abstract Task<IActionResult> UpdateClient([FromRoute][Required][RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$")] string version, [Required] Guid clientId, [Required] Guid sessionId, [Required] string currentPassword, string newPassword = null, string userName = null, string newClientName = null, string newClientLastName = null, string newClientAddress = null);
+        public abstract Task<IActionResult> UpdateClient(
+            [FromRoute][Required][RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$")][DefaultValue("0.1")] string version, 
+            [Required] Guid clientId, 
+            [Required] Guid sessionId, 
+            [Required] string currentPassword, 
+            string newPassword = null, 
+            string userName = null, 
+            string newClientName = null, 
+            string newClientLastName = null, 
+            string newClientAddress = null);
 
         [HttpDelete]
         [Route("~/{version}/Clients/")]
@@ -58,7 +71,10 @@ namespace StoreManagementService.Controllers
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(CustomResponseBadRequestExample))]
         [SwaggerResponse(statusCode: StatusCodes.Status400BadRequest, type: typeof(ErrorResponse), description: "Bab Request")]
         [SwaggerResponse(statusCode: StatusCodes.Status401Unauthorized, type: typeof(ActionResult), description: "Unauthorized")]
-        public abstract Task<IActionResult> DeleteClient([FromRoute][Required][RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$")] string version, [Required] Guid clientId, [Required] Guid sessionId);
+        public abstract Task<IActionResult> DeleteClient(
+            [FromRoute][Required][RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$")][DefaultValue("0.1")] string version,
+            [Required] Guid clientId, 
+            [Required] Guid sessionId);
 
     }
 }

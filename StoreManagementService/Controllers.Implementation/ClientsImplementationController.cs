@@ -8,6 +8,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using Swashbuckle.AspNetCore.Filters;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using static StoreManagementService.FilterProvider.ExamplesProvider;
@@ -37,7 +38,13 @@ namespace StoreManagementService.Controllers.Implementation
         [SwaggerResponse(statusCode: StatusCodes.Status201Created, type: typeof(CustomResponse), description: "Ok")]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(CustomResponseBadRequestExample))]
         [SwaggerResponse(statusCode: StatusCodes.Status400BadRequest, type: typeof(ErrorResponse), description: "Bab Request")]
-        public override async Task<IActionResult> AddClient([FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required] string version, [Required, EmailAddress] string emailAddress, [Required] string password, [Required] string clientName, [Required] string clientLastName, [Required] string clientAddress)
+        public override async Task<IActionResult> AddClient(
+            [FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required][DefaultValue("0.1")] string version,
+            [Required, EmailAddress] string emailAddress, 
+            [Required] string password, 
+            [Required] string clientName, 
+            [Required] string clientLastName,
+            [Required] string clientAddress)
         {
             // Log the request
             Dictionary<string, object> request = new Dictionary<string, object> { { "CreateNewUserRequest", new object[] { "version: " + version, "emailAddress: " + emailAddress } } };
@@ -70,7 +77,10 @@ namespace StoreManagementService.Controllers.Implementation
         [SwaggerResponse(statusCode: StatusCodes.Status200OK, type: typeof(CustomResponse), description: "Ok")]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(CustomResponseBadRequestExample))]
         [SwaggerResponse(statusCode: StatusCodes.Status400BadRequest, type: typeof(ErrorResponse), description: "Bab Request")]
-        public async override Task<IActionResult> Login([FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required] string version, [Required, EmailAddress] string emailAddress, [Required] string password)
+        public async override Task<IActionResult> Login(
+            [FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required][DefaultValue("0.1")] string version, 
+            [Required, EmailAddress] string emailAddress,
+            [Required] string password)
         {
             // Log the request
             Dictionary<string, object> request = new Dictionary<string, object> { { "LoginRequest", new object[] { "version: " + version, "emailAddress: " + emailAddress } } };
@@ -103,7 +113,16 @@ namespace StoreManagementService.Controllers.Implementation
         [SwaggerResponse(statusCode: StatusCodes.Status200OK, type: typeof(CustomResponse), description: "Ok")]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(CustomResponseBadRequestExample))]
         [SwaggerResponse(statusCode: StatusCodes.Status400BadRequest, type: typeof(ErrorResponse), description: "Bab Request")]
-        public async override Task<IActionResult> UpdateClient([FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required] string version, [Required] Guid clientId, [Required] Guid sessionId, [Required] string currentPassword, string newPassword = null, string userName = null, string newClientName = null, string newClientLastName = null, string newClientAddress = null)
+        public async override Task<IActionResult> UpdateClient(
+            [FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required][DefaultValue("0.1")] string version,
+            [Required] Guid clientId, 
+            [Required] Guid sessionId, 
+            [Required] string currentPassword, 
+            string newPassword = null, 
+            string userName = null, 
+            string newClientName = null, 
+            string newClientLastName = null, 
+            string newClientAddress = null)
         {
             // Log the request
             Dictionary<string, object> request = new Dictionary<string, object> { { "UpdateUserRequest", new object[] { "version: " + version, "clientId: " + clientId, "sessionId: " + sessionId, "newPassword: " + !String.IsNullOrEmpty(newPassword), "newUserName: " + !String.IsNullOrEmpty(userName), "newClientName: " + !String.IsNullOrEmpty(newClientName), "newClientLastName: " + !String.IsNullOrEmpty(newClientLastName), "newClientAddress: " + !String.IsNullOrEmpty(newClientAddress) } } };
@@ -135,7 +154,10 @@ namespace StoreManagementService.Controllers.Implementation
         [SwaggerResponse(statusCode: StatusCodes.Status200OK, type: typeof(CustomResponse), description: "Ok")]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(CustomResponseBadRequestExample))]
         [SwaggerResponse(statusCode: StatusCodes.Status400BadRequest, type: typeof(ErrorResponse), description: "Bab Request")]
-        public async override Task<IActionResult> DeleteClient([FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required] string version, [Required] Guid clientId, [Required] Guid sessionId)
+        public async override Task<IActionResult> DeleteClient(
+            [FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required][DefaultValue("0.1")] string version,
+            [Required] Guid clientId, 
+            [Required] Guid sessionId)
         {
             // Log the request
             Dictionary<string, object> request = new Dictionary<string, object> { { "DeleteClientRequest", new object[] { "version: " + version, "clientId: " + clientId, "sessionId: " + sessionId } } };

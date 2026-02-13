@@ -7,6 +7,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using Swashbuckle.AspNetCore.Filters;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
@@ -27,7 +28,7 @@ namespace StoreManagementService.Controllers
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(CustomResponseBadRequestExample))]
         [SwaggerResponse(statusCode: StatusCodes.Status400BadRequest, type: typeof(ErrorResponse), description: "Bab Request")]
         [SwaggerResponse(statusCode: StatusCodes.Status401Unauthorized, type: typeof(ActionResult), description: "Unauthorized")]
-        public abstract Task<IActionResult> AddItem([FromRoute][Required][RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$")] string version, [Required] Guid clientId, [Required] Guid sessionId, [Required] string itemCode, [Required] string itemDescription, [Required] decimal itemPrice, [Required] IFormFile itemImg, [Required] int itemStock);
+        public abstract Task<IActionResult> AddItem([FromRoute][Required][RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$")][DefaultValue("0.1")] string version, [Required] Guid clientId, [Required] Guid sessionId, [Required] string itemCode, [Required] string itemDescription, [Required] decimal itemPrice, [Required] IFormFile itemImg, [Required] int itemStock);
 
         [HttpPost]
         [Route("~/{version}/Items/")]
@@ -36,7 +37,11 @@ namespace StoreManagementService.Controllers
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(CustomResponseBadRequestExample))]
         [SwaggerResponse(statusCode: StatusCodes.Status400BadRequest, type: typeof(ErrorResponse), description: "Bab Request")]
         [SwaggerResponse(statusCode: StatusCodes.Status401Unauthorized, type: typeof(ActionResult), description: "Unauthorized")]
-        public abstract Task<IActionResult> GetItem([FromRoute][Required][RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$")] string version, [Required] Guid clientId, [Required] Guid sessionId, Guid? itemId = null);
+        public abstract Task<IActionResult> GetItem(
+            [FromRoute][Required][RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$")][DefaultValue("0.1")] string version, 
+            [Required] Guid clientId, 
+            [Required] Guid sessionId,
+            Guid? itemId = null);
 
         [HttpPut]
         [Route("~/{version}/Items/")]
@@ -45,7 +50,16 @@ namespace StoreManagementService.Controllers
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(CustomResponseBadRequestExample))]
         [SwaggerResponse(statusCode: StatusCodes.Status400BadRequest, type: typeof(ErrorResponse), description: "Bab Request")]
         [SwaggerResponse(statusCode: StatusCodes.Status401Unauthorized, type: typeof(ActionResult), description: "Unauthorized")]
-        public abstract Task<IActionResult> UpdateItem([FromRoute][Required][RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$")] string version, [Required] Guid clientId, [Required] Guid sessionId, [Required] Guid itemId,  string itemCode = null, string itemDescription = null, decimal? itemPrice = null, IFormFile itemImg = null, int? itemStock = null);
+        public abstract Task<IActionResult> UpdateItem(
+            [FromRoute][Required][RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$")][DefaultValue("0.1")] string version,
+            [Required] Guid clientId, 
+            [Required] Guid sessionId, 
+            [Required] Guid itemId,  
+            string itemCode = null, 
+            string itemDescription = null, 
+            decimal? itemPrice = null, 
+            IFormFile itemImg = null, 
+            int? itemStock = null);
 
         [HttpDelete]
         [Route("~/{version}/Items/")]
@@ -54,6 +68,10 @@ namespace StoreManagementService.Controllers
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(CustomResponseBadRequestExample))]
         [SwaggerResponse(statusCode: StatusCodes.Status400BadRequest, type: typeof(ErrorResponse), description: "Bab Request")]
         [SwaggerResponse(statusCode: StatusCodes.Status401Unauthorized, type: typeof(ActionResult), description: "Unauthorized")]
-        public abstract Task<IActionResult> DeleteItem([FromRoute][Required][RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$")] string version, [Required] Guid clientId, [Required] Guid sessionId, Guid itemId);
+        public abstract Task<IActionResult> DeleteItem(
+            [FromRoute][Required][RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$")][DefaultValue("0.1")] string version, 
+            [Required] Guid clientId, 
+            [Required] Guid sessionId, 
+            Guid itemId);
     }
 }

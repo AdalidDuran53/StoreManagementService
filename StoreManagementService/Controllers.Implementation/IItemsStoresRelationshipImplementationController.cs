@@ -9,6 +9,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using Swashbuckle.AspNetCore.Filters;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using static StoreManagementService.FilterProvider.ExamplesProvider;
@@ -36,7 +37,13 @@ namespace StoreManagementService.Controllers.Implementation
         [SwaggerResponse(statusCode: StatusCodes.Status201Created, type: typeof(CustomResponse), description: "Ok")]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(CustomResponseBadRequestExample))]
         [SwaggerResponse(statusCode: StatusCodes.Status400BadRequest, type: typeof(ErrorResponse), description: "Bab Request")]
-        public async override Task<IActionResult> AddItem([FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required] string version, [Required] Guid clientId, [Required] Guid sessionId, [Required] Guid itemID, [Required] Guid storeId, [Required] DateTime operationDate)
+        public async override Task<IActionResult> AddItem(
+            [FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required][DefaultValue("0.1")] string version, 
+            [Required] Guid clientId, 
+            [Required] Guid sessionId, 
+            [Required] Guid itemID, 
+            [Required] Guid storeId, 
+            [Required] DateTime operationDate)
         {
             // Log the request
             Dictionary<string, object> request = new Dictionary<string, object> { { "CreateNewItemsStoreRequest", new object[] { "version: " + version, "clientId: " + clientId, "sessionId: " + sessionId, "itemID: " + itemID, "storeId: " + storeId, "operationDate: " + operationDate } } };
@@ -68,7 +75,12 @@ namespace StoreManagementService.Controllers.Implementation
         [SwaggerResponse(statusCode: StatusCodes.Status200OK, type: typeof(CustomResponse), description: "Ok")]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(CustomResponseBadRequestExample))]
         [SwaggerResponse(statusCode: StatusCodes.Status400BadRequest, type: typeof(ErrorResponse), description: "Bab Request")]
-        public async override Task<IActionResult> GetItem([FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required] string version, [Required] Guid clientId, [Required] Guid sessionId, [Required] Guid storeId, Guid? itemId = null)
+        public async override Task<IActionResult> GetItem(
+            [FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required][DefaultValue("0.1")] string version, 
+            [Required] Guid clientId, 
+            [Required] Guid sessionId, 
+            [Required] Guid storeId, 
+            Guid? itemId = null)
         {
             // Log the request
             Dictionary<string, object> request = new Dictionary<string, object> { { "GetItemsStoreRequest", new object[] { "version: " + version, "clientId: " + clientId, "sessionId: " + sessionId, "itemId: " + itemId } } };
@@ -100,7 +112,12 @@ namespace StoreManagementService.Controllers.Implementation
         [SwaggerResponse(statusCode: StatusCodes.Status200OK, type: typeof(CustomResponse), description: "Ok")]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(CustomResponseBadRequestExample))]
         [SwaggerResponse(statusCode: StatusCodes.Status400BadRequest, type: typeof(ErrorResponse), description: "Bab Request")]
-        public async override Task<IActionResult> DeleteItem([FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required] string version, [Required] Guid clientId, [Required] Guid sessionId, [Required] Guid storeId, [Required] Guid itemId)
+        public async override Task<IActionResult> DeleteItem(
+            [FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required][DefaultValue("0.1")] string version,
+            [Required] Guid clientId,
+            [Required] Guid sessionId,
+            [Required] Guid storeId,
+            [Required] Guid itemId)
         {
             // Log the request
             Dictionary<string, object> request = new Dictionary<string, object> { { "DeleteItemsStoreRequest", new object[] { "version: " + version, "clientId: " + clientId, "sessionId: " + sessionId } } };

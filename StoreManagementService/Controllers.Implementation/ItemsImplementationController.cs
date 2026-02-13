@@ -9,6 +9,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using Swashbuckle.AspNetCore.Filters;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using static StoreManagementService.FilterProvider.ExamplesProvider;
@@ -36,7 +37,15 @@ namespace StoreManagementService.Controllers.Implementation
         [SwaggerResponse(statusCode: StatusCodes.Status201Created, type: typeof(CustomResponse), description: "Ok")]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(CustomResponseBadRequestExample))]
         [SwaggerResponse(statusCode: StatusCodes.Status400BadRequest, type: typeof(ErrorResponse), description: "Bab Request")]
-        public async override Task<IActionResult> AddItem([FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required] string version, [Required] Guid clientId, [Required] Guid sessionId, [Required] string itemCode, [Required] string itemDescription, [Required] decimal itemPrice, [Required] IFormFile itemImg, [Required] int itemStock)
+        public async override Task<IActionResult> AddItem(
+            [FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required][DefaultValue("0.1")] string version,
+            [Required] Guid clientId,
+            [Required] Guid sessionId,
+            [Required] string itemCode, 
+            [Required] string itemDescription,
+            [Required] decimal itemPrice,
+            [Required] IFormFile itemImg,
+            [Required] int itemStock)
         {
             // Log the request
             Dictionary<string, object> request = new Dictionary<string, object> { { "CreateNewStoreRequest", new object[] { "version: " + version, "clientId: " + clientId, "sessionId: " + sessionId } } };
@@ -68,7 +77,11 @@ namespace StoreManagementService.Controllers.Implementation
         [SwaggerResponse(statusCode: StatusCodes.Status200OK, type: typeof(CustomResponse), description: "Ok")]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(CustomResponseBadRequestExample))]
         [SwaggerResponse(statusCode: StatusCodes.Status400BadRequest, type: typeof(ErrorResponse), description: "Bab Request")]
-        public async override Task<IActionResult> GetItem([FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required] string version, [Required] Guid clientId, [Required] Guid sessionId, Guid? itemId = null)
+        public async override Task<IActionResult> GetItem(
+            [FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required][DefaultValue("0.1")] string version,
+            [Required] Guid clientId, 
+            [Required] Guid sessionId, 
+            Guid? itemId = null)
         {
             // Log the request
             Dictionary<string, object> request = new Dictionary<string, object> { { "GetItemRequest", new object[] { "version: " + version, "clientId: " + clientId, "sessionId: " + sessionId, "itemId: " + itemId } } };
@@ -100,7 +113,16 @@ namespace StoreManagementService.Controllers.Implementation
         [SwaggerResponse(statusCode: StatusCodes.Status200OK, type: typeof(CustomResponse), description: "Ok")]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(CustomResponseBadRequestExample))]
         [SwaggerResponse(statusCode: StatusCodes.Status400BadRequest, type: typeof(ErrorResponse), description: "Bab Request")]
-        public async override Task<IActionResult> UpdateItem([FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required] string version, [Required] Guid clientId, [Required] Guid sessionId, [Required] Guid itemId, string itemCode = null, string itemDescription = null, decimal? itemPrice = null, IFormFile itemImg = null, int? itemStock = null)
+        public async override Task<IActionResult> UpdateItem(
+            [FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required][DefaultValue("0.1")] string version, 
+            [Required] Guid clientId, 
+            [Required] Guid sessionId,
+            [Required] Guid itemId, 
+            string itemCode = null, 
+            string itemDescription = null, 
+            decimal? itemPrice = null, 
+            IFormFile itemImg = null,
+            int? itemStock = null)
         {
             // Log the request
             Dictionary<string, object> request = new Dictionary<string, object> { { "UpdateItemRequest", new object[] { "version: " + version, "clientId: " + clientId, "sessionId: " + sessionId, "itemId: " + itemId, "itemCode: " + itemCode, "itemDescription: " + itemDescription, "itemPrice: " + itemPrice, "itemImg: " + (itemImg != null), "itemStock: " + itemStock } } };
@@ -132,7 +154,11 @@ namespace StoreManagementService.Controllers.Implementation
         [SwaggerResponse(statusCode: StatusCodes.Status200OK, type: typeof(CustomResponse), description: "Ok")]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(CustomResponseBadRequestExample))]
         [SwaggerResponse(statusCode: StatusCodes.Status400BadRequest, type: typeof(ErrorResponse), description: "Bab Request")]
-        public async override Task<IActionResult> DeleteItem([FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required] string version, [Required] Guid clientId, [Required] Guid sessionId, Guid itemId)
+        public async override Task<IActionResult> DeleteItem(
+            [FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required][DefaultValue("0.1")] string version,
+            [Required] Guid clientId, 
+            [Required] Guid sessionId, 
+            Guid itemId)
         {
             // Log the request
             Dictionary<string, object> request = new Dictionary<string, object> { { "DeleteItemRequest", new object[] { "version: " + version, "clientId: " + clientId, "sessionId: " + sessionId } } };
