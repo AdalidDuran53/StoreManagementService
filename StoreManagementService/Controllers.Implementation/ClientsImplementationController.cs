@@ -94,12 +94,82 @@ namespace StoreManagementService.Controllers.Implementation
                 // Log the operation
                 await _serviceBaseFunctionality.LogOperation(request, response);
                 // return the result // OMS-13 update to include session id in the response
-                return Ok(new CustomResponse(statusCode: StatusCodes.Status200OK, message: result.Message, clientId: result.ClientId, sessionId: sessionLogResponse.SessionId));
+                return Ok(new CustomResponse(statusCode: StatusCodes.Status200OK, message: result.Message, clientId: result.ClientId, sessionId: sessionLogResponse.SessionId, data: result.Data));
             }
             catch (Exception ex)
             {
                 // Log the exception
                 Dictionary<string, object> response = new Dictionary<string, object> { { "ErrorLoginResponse", ex } };
+                await _serviceBaseFunctionality.LogOperation(request, response);
+                // if the exception is an OperationException, return a bad request with the error details
+                OperationException excep = ((OperationException)ex);
+                return this.BadRequest(new { StatusCode = StatusCodes.Status400BadRequest, code = excep.ErrorCode, message = excep.Message, details = excep.Details });
+            }
+        }
+
+        [HttpPost]
+        [Route("~/{version::apiVersion}/Clients/VerifyCode")]
+        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(CustomResponseOKExample))]
+        [SwaggerResponse(statusCode: StatusCodes.Status200OK, type: typeof(CustomResponse), description: "Ok")]
+        [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(CustomResponseBadRequestExample))]
+        [SwaggerResponse(statusCode: StatusCodes.Status400BadRequest, type: typeof(ErrorResponse), description: "Bab Request")]
+        public async override Task<IActionResult> VerifyCode(
+            [FromRoute][Required][RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$")][DefaultValue("0.1")] string version,
+            [Required] Guid clientId,
+            [Required] Guid sessionId,
+            [Required] Guid token,
+            [Required] string code)
+        {
+            // Log the request
+            Dictionary<string, object> request = new Dictionary<string, object> { { "VerifyCodeRequest", new object[] { "version: " + version, "clientId: " + clientId, "token: " + token } } };
+            try
+            {
+                // Call the implementation
+                var result = await _emailVerifyFunctionality.VerifyCode(sessionId, clientId, token, code);
+                Dictionary<string, object> response = new Dictionary<string, object> { { "VerifyCodeResponse", result } };
+                // Log the operation
+                await _serviceBaseFunctionality.LogOperation(request, response);
+                // return the result // OMS-13 update to include session id in the response
+                return Ok(new CustomResponse(statusCode: StatusCodes.Status200OK, message: result.Message, clientId: result.ClientId, sessionId: sessionId, data: result.Data));
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                Dictionary<string, object> response = new Dictionary<string, object> { { "ErrorVerifyCodeResponse", ex } };
+                await _serviceBaseFunctionality.LogOperation(request, response);
+                // if the exception is an OperationException, return a bad request with the error details
+                OperationException excep = ((OperationException)ex);
+                return this.BadRequest(new { StatusCode = StatusCodes.Status400BadRequest, code = excep.ErrorCode, message = excep.Message, details = excep.Details });
+            }
+        }
+
+        [HttpPost]
+        [Route("~/{version::apiVersion}/Clients/RequestVerifyCode")]
+        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(CustomResponseOKExample))]
+        [SwaggerResponse(statusCode: StatusCodes.Status200OK, type: typeof(CustomResponse), description: "Ok")]
+        [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(CustomResponseBadRequestExample))]
+        [SwaggerResponse(statusCode: StatusCodes.Status400BadRequest, type: typeof(ErrorResponse), description: "Bab Request")]
+        public async override Task<IActionResult> RequestVerifyCode(
+            [FromRoute][Required][RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$")][DefaultValue("0.1")] string version,
+            [Required] Guid clientId,
+            [Required] Guid sessionId)
+        {
+            // Log the request
+            Dictionary<string, object> request = new Dictionary<string, object> { { "RequestVerifyCodeRequest", new object[] { "version: " + version, "clientId: " + clientId} } };
+            try
+            {
+                // Call the implementation
+                var result = await _emailVerifyFunctionality.RequestVerifyCode(string.Empty, clientId, sessionId);
+                Dictionary<string, object> response = new Dictionary<string, object> { { "RequestVerifyCodeResponse", result } };
+                // Log the operation
+                await _serviceBaseFunctionality.LogOperation(request, response);
+                // return the result // OMS-13 update to include session id in the response
+                return Ok(new CustomResponse(statusCode: StatusCodes.Status200OK, message: result.Message, clientId: result.ClientId, sessionId: sessionId, data: result.Data));
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                Dictionary<string, object> response = new Dictionary<string, object> { { "ErrorRequestVerifyCodeResponse", ex } };
                 await _serviceBaseFunctionality.LogOperation(request, response);
                 // if the exception is an OperationException, return a bad request with the error details
                 OperationException excep = ((OperationException)ex);

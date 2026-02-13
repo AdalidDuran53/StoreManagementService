@@ -77,7 +77,7 @@ namespace StoreManagementService.BusinessLogic
                     if (itemId.HasValue)
                     {
                         // check if the item exists
-                        var item = await context.ItemsClientsRelationships.FirstOrDefaultAsync(t => t.ItemId == itemId && t.IsDeleted == false && t.WasSold == false);
+                        var item = await context.ItemsClientsRelationships.FirstOrDefaultAsync(t => t.ItemId == itemId && t.IsDeleted == false && t.WasSold == false && t.ClientId == clientId);
                         // if not, throw an exception
                         if (item == null)
                         {
@@ -90,7 +90,7 @@ namespace StoreManagementService.BusinessLogic
                     else
                     {
                         // get all items
-                        existingItems = await context.ItemsClientsRelationships.Where(t => t.IsDeleted == false && t.WasSold == false).ToListAsync();
+                        existingItems = await context.ItemsClientsRelationships.Where(t => t.IsDeleted == false && t.WasSold == false && t.ClientId == clientId).ToListAsync();
                     }
 
                     var itemsResult = existingItems.Adapt<List<ItemsClientsRelationship>>();
@@ -176,7 +176,7 @@ namespace StoreManagementService.BusinessLogic
                 {
                     // find the Item by StoreId
                     var item = await context.ItemsClientsRelationships
-                    .FirstOrDefaultAsync(u => u.ItemId == itemId && u.IsDeleted == false && u.WasSold == false);
+                    .FirstOrDefaultAsync(u => u.ItemId == itemId && u.IsDeleted == false && u.WasSold == false && u.ClientId == clientId);
                     if (item == null)
                     {
                         var exception = this._errorService.GetError("OMS-ITEM-NOTFOUND-ERROR");

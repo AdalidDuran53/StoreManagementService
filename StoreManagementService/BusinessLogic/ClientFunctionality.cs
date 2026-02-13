@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StoreManagementService.Models;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace StoreManagementService.BusinessLogic
@@ -75,8 +76,10 @@ namespace StoreManagementService.BusinessLogic
                         throw new OperationException(errorCode: exception.Code, message: exception.Message, details: exception.Details, new Guid());
                     }
 
+                    var verifyCodes = await context.VerifyCodes.Where(x => x.ClientId == client.ClientId).ToListAsync();
+
                     // return the result
-                    return new CustomResponse(statusCode: StatusCodes.Status200OK, message: "Login successfully.", clientId: client.ClientId);
+                    return new CustomResponse(statusCode: StatusCodes.Status200OK, message: "Login successfully.", clientId: client.ClientId, data: verifyCodes.Any(s => s.VerifyStatus == (int)VerifyStatusCodes.Verified) ? null : verifyCodes.OrderByDescending(s => s.CreationDate).FirstOrDefault().Token);
                 }
             }
             catch (Exception ex)
