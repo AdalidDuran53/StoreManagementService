@@ -8,6 +8,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using Swashbuckle.AspNetCore.Filters;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using static StoreManagementService.FilterProvider.ExamplesProvider;
@@ -35,7 +36,12 @@ namespace StoreManagementService.Controllers.Implementation
         [SwaggerResponse(statusCode: StatusCodes.Status201Created, type: typeof(CustomResponse), description: "Ok")]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(CustomResponseBadRequestExample))]
         [SwaggerResponse(statusCode: StatusCodes.Status400BadRequest, type: typeof(ErrorResponse), description: "Bab Request")]
-        public async override Task<IActionResult> AddStore([FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required] string version, [Required] Guid clientId, [Required] Guid sessionId, [Required] string storeBranch, [Required] string storeAddress)
+        public async override Task<IActionResult> AddStore(
+            [FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required][DefaultValue("0.1")] string version,
+            [Required] Guid clientId, 
+            [Required] Guid sessionId, 
+            [Required] string storeBranch,
+            [Required] string storeAddress)
         {
             // Log the request
             Dictionary<string, object> request = new Dictionary<string, object> { { "CreateNewStoreRequest", new object[] { "version: " + version, "clientId: " + clientId, "sessionId: " + sessionId, "storeBranch: " + storeBranch, "storeAddress: " + storeAddress } } };
@@ -67,7 +73,11 @@ namespace StoreManagementService.Controllers.Implementation
         [SwaggerResponse(statusCode: StatusCodes.Status200OK, type: typeof(CustomResponse), description: "Ok")]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(CustomResponseBadRequestExample))]
         [SwaggerResponse(statusCode: StatusCodes.Status400BadRequest, type: typeof(ErrorResponse), description: "Bab Request")]
-        public async override Task<IActionResult> GetStore([FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required] string version, [Required] Guid clientId, [Required] Guid sessionId, Guid? storeId = null)
+        public async override Task<IActionResult> GetStore(
+            [FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required][DefaultValue("0.1")] string version,
+            [Required] Guid clientId,
+            [Required] Guid sessionId, 
+            Guid? storeId = null)
         {
             // Log the request
             Dictionary<string, object> request = new Dictionary<string, object> { { "GetStoreRequest", new object[] { "version: " + version, "clientId: " + clientId, "sessionId: " + sessionId, "storeId: " + storeId } } };
@@ -99,7 +109,13 @@ namespace StoreManagementService.Controllers.Implementation
         [SwaggerResponse(statusCode: StatusCodes.Status200OK, type: typeof(CustomResponse), description: "Ok")]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(CustomResponseBadRequestExample))]
         [SwaggerResponse(statusCode: StatusCodes.Status400BadRequest, type: typeof(ErrorResponse), description: "Bab Request")]
-        public async override Task<IActionResult> UpdateStore([FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required] string version, [Required] Guid clientId, [Required] Guid sessionId, [Required] Guid storeId, string newStoreBranch = null, string newStoreAddress = null)
+        public async override Task<IActionResult> UpdateStore(
+            [FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required][DefaultValue("0.1")] string version,
+            [Required] Guid clientId, 
+            [Required] Guid sessionId, 
+            [Required] Guid storeId, 
+            string newStoreBranch = null,
+            string newStoreAddress = null)
         {
             // Log the request
             Dictionary<string, object> request = new Dictionary<string, object> { { "UpdateStoreRequest", new object[] { "version: " + version, "clientId: " + clientId, "sessionId: " + sessionId, "storeId: " + storeId, "newStoreBranch: " + newStoreBranch, "newStoreAddress: " + newStoreAddress } } };
@@ -131,7 +147,11 @@ namespace StoreManagementService.Controllers.Implementation
         [SwaggerResponse(statusCode: StatusCodes.Status200OK, type: typeof(CustomResponse), description: "Ok")]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(CustomResponseBadRequestExample))]
         [SwaggerResponse(statusCode: StatusCodes.Status400BadRequest, type: typeof(ErrorResponse), description: "Bab Request")]
-        public async override Task<IActionResult> DeleteStore([FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required] string version, [Required] Guid clientId, [Required] Guid sessionId, Guid storeId)
+        public async override Task<IActionResult> DeleteStore(
+            [FromRoute, RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$"), Required][DefaultValue("0.1")] string version,
+            [Required] Guid clientId,
+            [Required] Guid sessionId, 
+            Guid storeId)
         {
             // Log the request
             Dictionary<string, object> request = new Dictionary<string, object> { { "DeleteStoreRequest", new object[] { "version: " + version, "clientId: " + clientId, "sessionId: " + sessionId } } };
