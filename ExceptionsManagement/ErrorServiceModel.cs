@@ -71,6 +71,11 @@ namespace ExceptionsManagement
                 code: "OMS-CLIENTADDRESS-ERROR",
                 message: "Invalid Client address.",
                 details: "Client address is not valid."));
+
+            errors.Add("OMS-VERIFY-CODE-ERROR", new ErroritemServiceModel(
+                code: "OMS-CLIENTADDRESS-ERROR",
+                message: "Invalid code.",
+                details: "code is not valid."));
             #endregion
 
             #region Session

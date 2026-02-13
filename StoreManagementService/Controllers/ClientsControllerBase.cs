@@ -44,6 +44,34 @@ namespace StoreManagementService.Controllers
             [Required, EmailAddress] string emailAddress, 
             [Required] string password);
 
+        [HttpPost]
+        [Route("~/{version}/Clients/")]
+        [SwaggerOperation(OperationId = "VerifyCode")]
+        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(CustomResponseOKExample))]
+        [SwaggerResponse(statusCode: StatusCodes.Status200OK, type: typeof(CustomResponse), description: "Ok")]
+        [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(CustomResponseBadRequestExample))]
+        [SwaggerResponse(statusCode: StatusCodes.Status400BadRequest, type: typeof(ErrorResponse), description: "Bab Request")]
+        [SwaggerResponse(statusCode: StatusCodes.Status401Unauthorized, type: typeof(ActionResult), description: "Unauthorized")]
+        public abstract Task<IActionResult> VerifyCode(
+            [FromRoute][Required][RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$")][DefaultValue("0.1")] string version,
+            [Required] Guid clientId,
+            [Required] Guid sessionId,
+            [Required] Guid token,
+            [Required] string code);
+
+        [HttpPost]
+        [Route("~/{version}/Clients/")]
+        [SwaggerOperation(OperationId = "RequestVerifyCode")]
+        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(CustomResponseOKExample))]
+        [SwaggerResponse(statusCode: StatusCodes.Status200OK, type: typeof(CustomResponse), description: "Ok")]
+        [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(CustomResponseBadRequestExample))]
+        [SwaggerResponse(statusCode: StatusCodes.Status400BadRequest, type: typeof(ErrorResponse), description: "Bab Request")]
+        [SwaggerResponse(statusCode: StatusCodes.Status401Unauthorized, type: typeof(ActionResult), description: "Unauthorized")]
+        public abstract Task<IActionResult> RequestVerifyCode(
+            [FromRoute][Required][RegularExpression("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)$")][DefaultValue("0.1")] string version,
+            [Required] Guid clientId,
+            [Required] Guid sessionId);
+
         [HttpPut]
         [Route("~/{version}/Clients/")]
         [SwaggerOperation(OperationId = "UpdateClient")]
